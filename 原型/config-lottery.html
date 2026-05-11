@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抽奖奖品配置</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0B0E1A;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    padding: 40px 32px 80px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color 0.15s;
+  }
+  .back:hover { color: rgba(255,255,255,0.7); }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 32px;
+  }
+
+  .note {
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: rgba(245,200,66,0.8);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  table {
+    width: 100%;
+    max-width: 700px;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+  }
+  thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 0 16px 12px;
+  }
+  tbody tr {
+    background: #131929;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  tbody tr:first-child td:first-child { border-radius: 12px 0 0 0; }
+  tbody tr:first-child td:last-child { border-radius: 0 12px 0 0; }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 12px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 12px 0; }
+  tbody tr:last-child { border-bottom: none; }
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .prize-name {
+    font-weight: 600;
+  }
+  .prize-type {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .prize-type.crypto { background: rgba(61,123,255,0.15); color: #3D7BFF; }
+  .prize-type.coin { background: rgba(245,200,66,0.12); color: #F5C842; }
+  .prize-type.empty { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
+
+  .prob-val {
+    font-variant-numeric: tabular-nums;
+    color: #00D68F;
+    font-weight: 600;
+  }
+  .prob-val.low { color: rgba(255,255,255,0.35); font-weight: 400; }
+  .prob-val.high { color: #F5C842; }
+
+  .qty-val { color: rgba(255,255,255,0.5); font-size: 13px; }
+
+  .prob-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prob-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    width: 80px;
+    overflow: hidden;
+  }
+  .prob-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #00D68F;
+  }
+  .prob-bar-fill.low { background: rgba(255,255,255,0.2); }
+  .prob-bar-fill.high { background: #F5C842; }
+
+  .total-row {
+    background: rgba(245,200,66,0.04);
+    border-top: 1px solid rgba(245,200,66,0.15) !important;
+  }
+  .total-row td { color: rgba(255,255,255,0.5); font-size: 13px; }
+  .total-row td:last-child { color: #F5C842; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<a class="back" href="index-menu.html">‹ 返回导航</a>
+
+<div class="page-title">抽奖奖品配置</div>
+<div class="page-sub">每日抽奖 · 100世界币/次 · 每日3次 · 08:00重置</div>
+
+<div class="note">
+  ⚠️ 此配置表由开发直接维护，无需进入后台。修改概率后须确保总和为 100%。<br>
+  奖品库存为 0 时自动降级为"谢谢参与"，不影响其他奖品概率。
+</div>
+
+<div class="section-label">奖品池</div>
+<table>
+  <thead>
+    <tr>
+      <th>奖品</th>
+      <th>数量/份</th>
+      <th>中奖概率</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="prize-name">BTC</span><span class="prize-type crypto">加密货币</span></td>
+      <td><span class="qty-val">0.0001 BTC</span></td>
+      <td><span class="prob-val high">0.5%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill high" style="width:1%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">ETH</span><span class="prize-type crypto">加密货币</span></td>
+      <td><span class="qty-val">0.001 ETH</span></td>
+      <td><span class="prob-val high">1%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill high" style="width:2%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">USDT</span><span class="prize-type crypto">加密货币</span></td>
+      <td><span class="qty-val">5 USDT</span></td>
+      <td><span class="prob-val">3%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:6%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">USDT</span><span class="prize-type crypto">加密货币</span></td>
+      <td><span class="qty-val">1 USDT</span></td>
+      <td><span class="prob-val">6%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:12%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">世界币</span><span class="prize-type coin">活动积分</span></td>
+      <td><span class="qty-val">500 世界币</span></td>
+      <td><span class="prob-val">5%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:10%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">世界币</span><span class="prize-type coin">活动积分</span></td>
+      <td><span class="qty-val">200 世界币</span></td>
+      <td><span class="prob-val">15%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:30%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">世界币</span><span class="prize-type coin">活动积分</span></td>
+      <td><span class="qty-val">100 世界币</span></td>
+      <td><span class="prob-val">20%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:40%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><span class="prize-name">谢谢参与</span><span class="prize-type empty">空奖</span></td>
+      <td><span class="qty-val">—</span></td>
+      <td><span class="prob-val low">49.5%</span></td>
+      <td>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar"><div class="prob-bar-fill low" style="width:100%"></div></div>
+        </div>
+      </td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="2" style="font-size:12px;color:rgba(255,255,255,0.3);">合计</td>
+      <td colspan="2">100%</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

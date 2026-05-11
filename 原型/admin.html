@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>世界杯活动 · 后台管理</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --sidebar: #2C2F3A;
+  --bg: #E8F4E8;
+  --card: #FFFFFF;
+  --border: #D0D5DD;
+  --text: #1D2939;
+  --text2: #667085;
+  --text3: #98A2B3;
+  --blue: #2E5BFF;
+  --blue-light: #EEF2FF;
+  --green: #12B76A;
+  --green-bg: #ECFDF5;
+  --red: #F04438;
+  --red-light: #FFF1F0;
+}
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  display: flex;
+  min-height: 100vh;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 200px; background: var(--sidebar); color: #fff;
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo-icon {
+  width: 32px; height: 32px; background: #F5C842; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #1D2939; font-weight: 900;
+}
+.sidebar-logo-text { font-size: 14px; font-weight: 700; }
+.sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 13px; color: rgba(255,255,255,0.55);
+  cursor: pointer; transition: all 0.15s;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+.sidebar-item.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; padding: 28px 32px 60px; max-width: 1000px; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════ LIST PAGE ═══════════ */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.page-title { font-size: 20px; font-weight: 700; color: #101828; }
+.page-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+.stats-row { display: flex; gap: 24px; margin-bottom: 20px; }
+.stat-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 20px; min-width: 130px;
+}
+.stat-card .num { font-size: 24px; font-weight: 800; color: var(--text); }
+.stat-card .lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.stat-card.highlight { border-color: var(--blue); background: var(--blue-light); }
+.stat-card.highlight .num { color: var(--blue); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent; transition: all 0.15s;
+}
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { background: #1E4BD8; }
+.btn-outline { background: #fff; color: var(--text2); border-color: var(--border); }
+.btn-outline:hover { background: #F9FAFB; color: var(--text); }
+.btn-ghost-sm {
+  background: transparent; color: var(--blue); border: none;
+  padding: 4px 8px; font-size: 12px; cursor: pointer; font-weight: 500;
+}
+.btn-ghost-sm:hover { background: var(--blue-light); border-radius: 4px; }
+
+.data-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.data-table th {
+  font-size: 12px; color: var(--text2); font-weight: 500;
+  padding: 12px 16px; text-align: left; background: #FAFBFC;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 12px 16px; border-bottom: 1px solid #F0F2F5; font-size: 13px;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #FAFBFC; }
+
+.status {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.status.done { background: var(--green-bg); color: #15803D; }
+.status.today { background: var(--blue-light); color: var(--blue); }
+.status.pending { background: #F9FAFB; color: var(--text3); border: 1px solid var(--border); }
+.status.rest { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+
+.match-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.match-tag {
+  background: #F2F4F7; color: var(--text2); padding: 2px 8px;
+  border-radius: 4px; font-size: 11px;
+}
+
+/* ═══════════ EDIT PAGE ═══════════ */
+.edit-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+}
+.back-link { color: var(--text2); cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.back-link:hover { color: var(--blue); }
+
+.edit-date-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 16px; margin-bottom: 20px;
+}
+.edit-date-bar label { font-size: 13px; font-weight: 600; color: var(--text2); white-space: nowrap; }
+.edit-date-bar input {
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 7px 10px; font-size: 14px; color: var(--text); outline: none; width: 200px;
+}
+.edit-date-bar input:focus { border-color: var(--blue); }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 15px; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--blue); }
+.card-subtitle { font-size: 12px; color: var(--text3); font-weight: 400; margin-left: auto; }
+
+.match-table { width: 100%; border-collapse: collapse; }
+.match-table th {
+  font-size: 12px; color: var(--text2); font-weight: 500;
+  padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.match-table td { padding: 8px 12px; border-bottom: 1px solid #F0F2F5; }
+.match-table input, .match-table select {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; color: var(--text); background: #FAFBFC;
+  outline: none; transition: border-color 0.15s;
+}
+.match-table input:focus, .match-table select:focus { border-color: var(--blue); background: #fff; }
+.match-table .odds-input { width: 70px; text-align: center; }
+.match-table .match-select { min-width: 200px; }
+
+.btn-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+.btn-danger {
+  background: transparent; color: var(--red); padding: 4px 8px;
+  font-size: 12px; border: none; cursor: pointer;
+}
+.btn-danger:hover { background: var(--red-light); border-radius: 4px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-hint { font-size: 12px; color: var(--text3); margin-top: -2px; }
+.form-input {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; color: var(--text); background: #FAFBFC;
+  outline: none; width: 180px; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--blue); background: #fff; }
+.form-row { display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  background: #1D2939; color: #fff; padding: 12px 24px;
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  z-index: 999; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+
+.footer-actions {
+  display: flex; gap: 12px; margin-top: 28px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── REWARD TABS ── */
+.reward-tabs {
+  display: flex; gap: 4px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--border); padding-bottom: 0;
+}
+.reward-tab {
+  padding: 8px 16px; font-size: 13px; font-weight: 500;
+  color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all 0.15s;
+}
+.reward-tab:hover { color: var(--text); }
+.reward-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+
+/* reward status */
+.status.approved { background: var(--blue-light); color: var(--blue); }
+.status.distributed { background: var(--green-bg); color: #15803D; }
+.status.rejected { background: #FFF1F0; color: var(--red); }
+.status.reviewing { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+
+.btn-approve {
+  flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600;
+  background: var(--blue-light); color: var(--blue); border: none; cursor: pointer;
+}
+.btn-approve:hover { background: #DBEAFE; }
+.btn-reject {
+  flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600;
+  background: #FFF1F0; color: var(--red); border: none; cursor: pointer;
+}
+.btn-reject:hover { background: #FFE4E6; }
+.btn-distribute {
+  width: 100%; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600;
+  background: var(--green-bg); color: #15803D; border: none; cursor: pointer;
+}
+
+/* ── REVIEW MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff; border-radius: 14px; padding: 28px;
+  width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #101828; }
+.modal-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid #F0F2F5; font-size: 13px;
+}
+.modal-row:last-of-type { border-bottom: none; }
+.modal-row .lbl { color: var(--text2); }
+.modal-row .val { font-weight: 600; color: var(--text); }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-close {
+  position: absolute; top: 16px; right: 20px;
+  background: none; border: none; font-size: 20px;
+  color: var(--text3); cursor: pointer; line-height: 1;
+}
+.btn-distribute:hover { background: #D1FAE5; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">⚡</div>
+    <div class="sidebar-logo-text">BitTap 管理</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sidebar-item active" id="nav-activity" onclick="navTo('activity')">⚽ 世界杯活动</div>
+    <div class="sidebar-item" id="nav-reward" onclick="navTo('reward')">🏆 奖励审核</div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ 配置已保存</div>
+
+<!-- ── 审核弹窗 ── -->
+<div class="modal-overlay" id="reviewOverlay" onclick="closeReview(event)">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeReviewModal()">×</button>
+    <div class="modal-title">奖励审核</div>
+    <div class="modal-row"><span class="lbl">用户</span><span class="val" id="m-user">—</span></div>
+    <div class="modal-row"><span class="lbl">来源</span><span class="val" id="m-source">—</span></div>
+    <div class="modal-row"><span class="lbl">奖励</span><span class="val" id="m-reward">—</span></div>
+    <div class="modal-row"><span class="lbl">触发时间</span><span class="val" id="m-time">—</span></div>
+    <div class="modal-row"><span class="lbl">当前状态</span><span id="m-status">—</span></div>
+    <div class="modal-actions" id="m-actions"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ═══════════ 列表页 ═══════════ -->
+  <div class="page active" id="pageList">
+    <div class="page-header">
+      <div>
+        <div class="page-title">2026世界杯 · 每日配置</div>
+        <div class="page-sub">活动时间 06/12 — 07/19，共 38 天</div>
+      </div>
+      <button class="btn btn-primary" onclick="createNew()">+ 添加日期配置</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card highlight"><div class="num">38</div><div class="lbl">总天数</div></div>
+      <div class="stat-card"><div class="num">12</div><div class="lbl">已配置</div></div>
+      <div class="stat-card"><div class="num">3</div><div class="lbl">进行中</div></div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>日期</th><th>赛事</th><th>每日赠送</th><th>抽奖次数</th><th>抽奖消耗</th><th>状态</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600">06/13 周六</td>
+          <td><div class="match-tags"><span class="match-tag">巴西 vs 阿根廷</span><span class="match-tag">德国 vs 法国</span></div></td>
+          <td>10 世界币</td><td>3 次</td><td>100</td>
+          <td><span class="status today">● 今天</span></td>
+          <td><button class="btn-ghost-sm" onclick="editDay('06/13')">编辑</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">06/14 周日</td>
+          <td><div class="match-tags"><span class="match-tag">西班牙 vs 葡萄牙</span><span class="match-tag">荷兰 vs 比利时</span></div></td>
+          <td>10 世界币</td><td>3 次</td><td>100</td>
+          <td><span class="status done">✓ 已配置</span></td>
+          <td><button class="btn-ghost-sm" onclick="editDay('06/14')">编辑</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">06/15 周一</td>
+          <td><div class="match-tags"><span class="match-tag">英格兰 vs 意大利</span></div></td>
+          <td>15 世界币</td><td>5 次</td><td>80</td>
+          <td><span class="status done">✓ 已配置</span></td>
+          <td><button class="btn-ghost-sm" onclick="editDay('06/15')">编辑</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">06/16 周二</td>
+          <td><div class="match-tags"><span class="match-tag" style="color:var(--text3)">未配置</span></div></td>
+          <td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td>
+          <td><span class="status pending">○ 待配置</span></td>
+          <td><button class="btn-ghost-sm" onclick="editDay('06/16', false)">编辑</button></td>
+        </tr>
+        <tr style="opacity:0.6">
+          <td style="font-weight:600">06/17 周三</td>
+          <td><div class="match-tags"><span class="match-tag" style="color:var(--text3)">—</span></div></td>
+          <td style="color:var(--text3)">10 世界币</td><td style="color:var(--text3)">3 次</td><td style="color:var(--text3)">100</td>
+          <td><span class="status rest">◌ 休赛日</span></td>
+          <td><button class="btn-ghost-sm" onclick="editDay('06/17', true)">编辑</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ 编辑页 ═══════════ -->
+  <div class="page" id="pageEdit">
+    <div class="edit-header">
+      <span class="back-link" onclick="goToList()">← 返回列表</span>
+    </div>
+    <div class="edit-date-bar">
+      <label>配置日期</label>
+      <input id="editDate" value="06/13" placeholder="例: 06/13">
+      <span style="font-size:12px;color:var(--text3)">配置该日 00:00 生效</span>
+      <label style="display:flex;align-items:center;gap:6px;margin-left:24px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;">
+        <input type="checkbox" id="isRestDay" onchange="toggleRestDay(this.checked)" style="width:15px;height:15px;cursor:pointer;">
+        休赛日（无赛事）
+      </label>
+    </div>
+
+    <!-- 模块1: 赛事 -->
+    <div class="card" id="matchCard">
+      <div class="card-title">每日赛事<span class="card-subtitle">该日开放的竞猜比赛</span></div>
+      <table class="match-table">
+        <thead>
+          <tr><th>赛程</th><th>主胜赔率</th><th>平局赔率</th><th>客胜赔率</th><th></th></tr>
+        </thead>
+        <tbody id="matchTbody">
+          <tr>
+            <td><select class="match-select" onchange="syncOdds(this)"><option>巴西 vs 阿根廷</option><option>德国 vs 法国</option><option>西班牙 vs 葡萄牙</option><option>荷兰 vs 比利时</option><option>英格兰 vs 意大利</option><option>巴西 vs 法国</option><option>阿根廷 vs 德国</option><option>英格兰 vs 葡萄牙</option><option>西班牙 vs 巴西</option><option>日本 vs 韩国</option><option>美国 vs 墨西哥</option><option>摩洛哥 vs 塞内加尔</option></select></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>
+          </tr>
+          <tr>
+            <td><select class="match-select" onchange="syncOdds(this)"><option>巴西 vs 阿根廷</option><option selected>德国 vs 法国</option><option>西班牙 vs 葡萄牙</option><option>荷兰 vs 比利时</option><option>英格兰 vs 意大利</option><option>巴西 vs 法国</option><option>阿根廷 vs 德国</option><option>英格兰 vs 葡萄牙</option><option>西班牙 vs 巴西</option><option>日本 vs 韩国</option><option>美国 vs 墨西哥</option><option>摩洛哥 vs 塞内加尔</option></select></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><input class="odds-input" value="×2"></td>
+            <td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="addMatch()">+ 添加比赛</button>
+      </div>
+    </div>
+
+    <!-- 模块2: 每日社交任务 -->
+    <div class="card">
+      <div class="card-title">每日社交任务<span class="card-subtitle">当日开放的 X 评论任务</span></div>
+      <div class="form-group">
+        <div class="form-label">X 帖子链接</div>
+        <div class="form-hint">用户需在该帖子下评论，完成后得 +10 世界币</div>
+        <input class="form-input" id="xPostUrl" type="url" placeholder="https://x.com/BitTap/status/..." style="width:420px">
+      </div>
+    </div>
+
+    <!-- 模块3: 每日赠送 -->
+    <div class="card">
+      <div class="card-title">每日赠送世界币<span class="card-subtitle">08:00 自动发放</span></div>
+      <div class="form-group">
+        <div class="form-label">赠送数量</div>
+        <div class="form-hint">当日未使用次日收回</div>
+        <input class="form-input" id="dailyCoin" type="number" value="10" min="0">
+      </div>
+    </div>
+
+    <!-- 模块4: 抽奖配置 -->
+    <div class="card">
+      <div class="card-title">每日抽奖<span class="card-subtitle">08:00 重置</span></div>
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">每日次数上限</div>
+          <div class="form-hint">每位用户每日最多可抽</div>
+          <input class="form-input" id="maxDraws" type="number" value="3" min="1">
+        </div>
+        <div class="form-group">
+          <div class="form-label">每次消耗世界币</div>
+          <div class="form-hint">每次抽奖扣除</div>
+          <input class="form-input" id="drawCost" type="number" value="100" min="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+      <button class="btn btn-outline" onclick="goToList()">取消</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ 奖励审核页 ═══════════ -->
+  <div class="page" id="pageReward">
+    <div class="page-header">
+      <div>
+        <div class="page-title">奖励审核</div>
+        <div class="page-sub">排行榜 BTC 奖励 · 抽奖发币审核</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card highlight"><div class="num">7</div><div class="lbl">待审核</div></div>
+      <div class="stat-card"><div class="num">23</div><div class="lbl">已批准</div></div>
+      <div class="stat-card"><div class="num">18</div><div class="lbl">已发放</div></div>
+      <div class="stat-card"><div class="num">2</div><div class="lbl">已拒绝</div></div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>用户</th><th>来源</th><th>奖励</th><th>触发时间</th><th>状态</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div style="font-weight:600">0x3f…a1b2</div><div style="font-size:12px;color:var(--text3)">UID 10023</div></td>
+          <td><span class="match-tag">排行榜</span></td>
+          <td style="font-weight:700;color:#B45309">1 BTC</td>
+          <td style="color:var(--text3)">07/19 结算</td>
+          <td><span class="status reviewing">● 待审核</span></td>
+          <td><button class="btn-ghost-sm" onclick="openReview(this, 'reviewing')">审核</button></td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:600">0x8c…d4e5</div><div style="font-size:12px;color:var(--text3)">UID 10087</div></td>
+          <td><span class="match-tag">排行榜</span></td>
+          <td style="font-weight:700;color:#B45309">0.5 BTC</td>
+          <td style="color:var(--text3)">07/19 结算</td>
+          <td><span class="status reviewing">● 待审核</span></td>
+          <td><button class="btn-ghost-sm" onclick="openReview(this, 'reviewing')">审核</button></td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:600">0x1a…9f3c</div><div style="font-size:12px;color:var(--text3)">UID 10156</div></td>
+          <td><span class="match-tag">抽奖</span></td>
+          <td style="font-weight:600">0.001 BTC</td>
+          <td style="color:var(--text3)">06/15 08:32</td>
+          <td><span class="status approved">✓ 已批准</span></td>
+          <td><button class="btn-ghost-sm" onclick="openReview(this, 'approved')">审核</button></td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:600">0x7d…b2a0</div><div style="font-size:12px;color:var(--text3)">UID 10201</div></td>
+          <td><span class="match-tag">抽奖</span></td>
+          <td style="font-weight:600">10 USDT</td>
+          <td style="color:var(--text3)">06/13 21:14</td>
+          <td><span class="status distributed">✓ 已发放</span></td>
+          <td style="color:var(--text3)">—</td>
+        </tr>
+        <tr>
+          <td><div style="font-weight:600">0x2e…c8d1</div><div style="font-size:12px;color:var(--text3)">UID 10334</div></td>
+          <td><span class="match-tag">抽奖</span></td>
+          <td style="font-weight:600">0.01 ETH</td>
+          <td style="color:var(--text3)">06/14 19:55</td>
+          <td><span class="status rejected">✗ 已拒绝</span></td>
+          <td style="color:var(--text3)">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+function goToList() { showPage('pageList'); }
+window.addEventListener('DOMContentLoaded', function() {
+  var p = new URLSearchParams(location.search).get('page');
+  if (p) navTo(p);
+});
+function navTo(section) {
+  document.querySelectorAll('.sidebar-item').forEach(function(el){ el.classList.remove('active'); });
+  if (section === 'reward') {
+    document.getElementById('nav-reward').classList.add('active');
+    showPage('pageReward');
+  } else {
+    document.getElementById('nav-activity').classList.add('active');
+    showPage('pageList');
+  }
+}
+function switchTab(el, type) {
+  document.querySelectorAll('.reward-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+}
+var _currentRow = null;
+function openReview(btn, state) {
+  _currentRow = btn.closest('tr');
+  var cells = _currentRow.cells;
+  document.getElementById('m-user').textContent = cells[0].innerText.trim();
+  document.getElementById('m-source').textContent = cells[1].innerText.trim();
+  document.getElementById('m-reward').textContent = cells[2].innerText.trim();
+  document.getElementById('m-time').textContent = cells[3].innerText.trim();
+  document.getElementById('m-status').innerHTML = cells[4].innerHTML;
+  var actions = document.getElementById('m-actions');
+  if (state === 'reviewing') {
+    actions.innerHTML = '<button class="btn-approve" onclick="approve()">通过</button><button class="btn-reject" onclick="reject()">拒绝</button>';
+  } else if (state === 'approved') {
+    actions.innerHTML = '<button class="btn-distribute" onclick="distribute()">标记已发放</button>';
+  } else {
+    actions.innerHTML = '';
+  }
+  document.getElementById('reviewOverlay').classList.add('show');
+}
+function closeReviewModal() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+}
+function closeReview(e) {
+  if (e.target === document.getElementById('reviewOverlay')) closeReviewModal();
+}
+function approve() {
+  _currentRow.cells[4].innerHTML = '<span class="status approved">✓ 已批准</span>';
+  _currentRow.cells[5].innerHTML = '<button class="btn-ghost-sm" onclick="openReview(this,\'approved\')">审核</button>';
+  closeReviewModal();
+}
+function reject() {
+  _currentRow.cells[4].innerHTML = '<span class="status rejected">✗ 已拒绝</span>';
+  _currentRow.cells[5].innerHTML = '<span style="color:var(--text3)">—</span>';
+  closeReviewModal();
+}
+function distribute() {
+  _currentRow.cells[4].innerHTML = '<span class="status distributed">✓ 已发放</span>';
+  _currentRow.cells[5].innerHTML = '<span style="color:var(--text3)">—</span>';
+  closeReviewModal();
+}
+function editDay(date, isRest) {
+  document.getElementById('editDate').value = date;
+  var rest = !!isRest;
+  document.getElementById('isRestDay').checked = rest;
+  toggleRestDay(rest);
+  showPage('pageEdit');
+}
+function createNew() {
+  document.getElementById('editDate').value = '';
+  document.getElementById('isRestDay').checked = false;
+  toggleRestDay(false);
+  showPage('pageEdit');
+}
+function toggleRestDay(isRest) {
+  document.getElementById('matchCard').style.display = isRest ? 'none' : 'block';
+}
+
+var MATCHES = ['巴西 vs 阿根廷','德国 vs 法国','西班牙 vs 葡萄牙','荷兰 vs 比利时','英格兰 vs 意大利','巴西 vs 法国','阿根廷 vs 德国','英格兰 vs 葡萄牙','西班牙 vs 巴西','日本 vs 韩国','美国 vs 墨西哥','摩洛哥 vs 塞内加尔'];
+function matchOptions() {
+  return MATCHES.map(function(m){ return '<option>'+m+'</option>'; }).join('');
+}
+function addMatch() {
+  var t = document.getElementById('matchTbody');
+  var r = document.createElement('tr');
+  r.innerHTML = '<td><select class="match-select" onchange="syncOdds(this)">'+matchOptions()+'</select></td>' +
+    '<td><input class="odds-input"></td><td><input class="odds-input"></td><td><input class="odds-input"></td>' +
+    '<td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>';
+  t.appendChild(r);
+}
+function syncOdds(sel) { /* placeholder for future auto-fill */ }
+function removeMatch(b) {
+  var t = document.getElementById('matchTbody');
+  if (t.rows.length > 1) b.closest('tr').remove();
+}
+
+function saveConfig() {
+  var toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+  setTimeout(function(){ goToList(); }, 800);
+}
+</script>
+
+</body>
+</html>

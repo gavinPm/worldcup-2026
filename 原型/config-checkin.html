@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>签到奖励配置</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0B0E1A;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    padding: 40px 32px 80px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color 0.15s;
+  }
+  .back:hover { color: rgba(255,255,255,0.7); }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 32px;
+  }
+
+  .note {
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: rgba(245,200,66,0.8);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+    max-width: 560px;
+    border-collapse: collapse;
+  }
+  thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 0 16px 12px;
+  }
+  tbody tr {
+    background: #131929;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  tbody tr:first-child td:first-child { border-radius: 12px 0 0 0; }
+  tbody tr:first-child td:last-child { border-radius: 0 12px 0 0; }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 12px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 12px 0; }
+  tbody tr:last-child { border-bottom: none; }
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  td:first-child { color: rgba(255,255,255,0.5); font-size: 13px; }
+  td.day-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .day-num {
+    width: 28px;
+    height: 28px;
+    background: rgba(61,123,255,0.12);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3D7BFF;
+  }
+  .day-num.special { background: rgba(245,200,66,0.12); color: #F5C842; }
+
+  .reward-val {
+    font-weight: 600;
+    color: #F5C842;
+  }
+  .reward-val .unit { font-size: 12px; color: rgba(255,255,255,0.35); font-weight: 400; margin-left: 4px; }
+
+  .bonus-tag {
+    display: inline-block;
+    font-size: 10px;
+    background: rgba(245,200,66,0.12);
+    color: #F5C842;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="index-menu.html">‹ 返回导航</a>
+
+<div class="page-title">签到奖励配置</div>
+<div class="page-sub">连续签到奖励梯度 · 每日 00:00 重置</div>
+
+<div class="note">
+  ⚠️ 此配置表由开发直接维护，无需进入后台。修改后重新部署即可生效。<br>
+  断签后天数归零，重新从第1天开始累计。
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>签到天数</th>
+      <th>奖励世界币</th>
+      <th>备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="day-num">1</span></td>
+      <td><span class="reward-val">50<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num">2</span></td>
+      <td><span class="reward-val">60<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num">3</span></td>
+      <td><span class="reward-val">80<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num">4</span></td>
+      <td><span class="reward-val">100<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num">5</span></td>
+      <td><span class="reward-val">120<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num">6</span></td>
+      <td><span class="reward-val">150<span class="unit">世界币</span></span></td>
+      <td style="color:rgba(255,255,255,0.3);font-size:13px;">—</td>
+    </tr>
+    <tr>
+      <td><span class="day-num special">7</span></td>
+      <td><span class="reward-val">300<span class="unit">世界币</span></span></td>
+      <td style="font-size:13px;"><span class="bonus-tag">连签奖励</span></td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

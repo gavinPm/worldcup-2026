@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>每日竞猜 · 场景状态</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #F5C842; --green: #00D68F; --red: #FF4D6A;
+    --bg: #0B0E1A; --card: #131929; --card2: #1A2236;
+    --border: rgba(255,255,255,0.08); --text: #FFFFFF;
+    --text2: rgba(255,255,255,0.6); --text3: rgba(255,255,255,0.35);
+    --accent: #3D7BFF;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, 'PingFang SC', sans-serif;
+    max-width: 390px; margin: 0 auto; padding: 20px 16px 60px;
+  }
+  .page-title {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 24px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .state-label {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    letter-spacing: 1px; margin-bottom: 10px; margin-top: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .state-label::before { content:''; flex:1; height:1px; background:var(--border); }
+  .state-label::after  { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ── Match Card ── */
+  .match-card {
+    background: var(--card); border-radius: 16px;
+    padding: 14px 14px 0; border: 1px solid var(--border);
+    position: relative; overflow: hidden; margin-bottom: 4px;
+  }
+  .right-bar {
+    position: absolute; left: 0; top: 16px; bottom: 16px;
+    width: 3px; border-radius: 2px;
+    background: linear-gradient(180deg, var(--gold), rgba(245,200,66,0.2));
+  }
+  .match-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; padding-left: 8px;
+  }
+  .match-time { font-size: 11px; color: var(--text3); }
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .tag-live    { background: rgba(255,77,106,0.15); color: var(--red);  border: 1px solid rgba(255,77,106,0.3); }
+  .tag-upcoming{ background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.25); }
+  .tag-ended   { background: rgba(255,255,255,0.06); color: var(--text3); border: 1px solid var(--border); }
+  .tag-win     { background: rgba(0,214,143,0.15); color: var(--green); border: 1px solid rgba(0,214,143,0.3); }
+  .tag-lose    { background: rgba(255,77,106,0.12); color: var(--red);  border: 1px solid rgba(255,77,106,0.2); }
+
+  .match-arena { display: flex; align-items: center; padding-left: 8px; margin-bottom: 14px; gap: 0; }
+  .team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .team-flag-wrap {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .team.home .team-flag-wrap { border-color: rgba(245,200,66,0.4); box-shadow: 0 0 14px rgba(245,180,40,0.2); }
+  .team.away .team-flag-wrap { border-color: rgba(61,123,255,0.4); box-shadow: 0 0 14px rgba(61,123,255,0.2); }
+  .team-name { font-size: 17px; font-weight: 700; }
+  .team-odds-pill {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; background: rgba(245,200,66,0.12);
+    border: 1px solid rgba(245,200,66,0.25); color: var(--gold);
+  }
+  .team.away .team-odds-pill { background: rgba(61,123,255,0.12); border-color: rgba(61,123,255,0.25); color: #7EB3FF; }
+  .vs-center { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 8px; }
+  .vs-text { font-size: 20px; font-weight: 900; color: #FF6B6B; text-shadow: 0 0 12px rgba(255,100,100,0.5); }
+  .match-bonus { font-size: 10px; font-weight: 700; color: var(--gold); background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); border-radius: 10px; padding: 2px 8px; }
+  .clash-line {
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    margin: 0 -14px 12px; position: relative;
+  }
+  .clash-line::after { content:'⚡'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 12px; background: var(--card); padding: 0 4px; }
+
+  .bet-options { display: flex; gap: 8px; margin: 0 0 12px; }
+  .bet-btn {
+    flex: 1; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+    padding: 10px 4px; text-align: center; cursor: pointer;
+    background: rgba(255,255,255,0.04); position: relative; overflow: hidden; transition: all 0.2s;
+  }
+  .bet-btn::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:transparent; }
+  .bet-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+  .bet-odds  { font-size: 17px; font-weight: 800; color: var(--text2); line-height: 1; }
+  .bet-odds.home { color: var(--gold); }
+  .bet-odds.away { color: #7EB3FF; }
+  .bet-chosen-tag { font-size: 9px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .bet-chosen-tag.win-tag  { color: var(--green); }
+  .bet-chosen-tag.lose-tag { color: var(--red); }
+
+  /* States */
+  .bet-btn.chosen {
+    border-color: rgba(245,200,66,0.7); background: rgba(245,200,66,0.1);
+    box-shadow: 0 0 14px rgba(245,180,40,0.25);
+  }
+  .bet-btn.chosen::before { background: linear-gradient(90deg, var(--gold), rgba(245,200,66,0.3)); }
+  .bet-btn.chosen .bet-odds { color: var(--gold); }
+  .bet-btn.unchosen { opacity: 0.3; pointer-events: none; }
+  .bet-btn.disabled { opacity: 0.35; pointer-events: none; }
+  .bet-btn.winner-btn {
+    border-color: rgba(0,214,143,0.7); background: rgba(0,214,143,0.1);
+    box-shadow: 0 0 14px rgba(0,214,143,0.25);
+  }
+  .bet-btn.winner-btn::before { background: linear-gradient(90deg, var(--green), rgba(0,214,143,0.3)); }
+  .bet-btn.winner-btn .bet-odds { color: var(--green); }
+  .bet-btn.loser-btn {
+    border-color: rgba(255,77,106,0.4); background: rgba(255,77,106,0.06);
+  }
+  .bet-btn.loser-btn .bet-odds { color: var(--red); opacity: 0.6; }
+  .bet-btn.result-winner {
+    border-color: rgba(0,214,143,0.5); background: rgba(0,214,143,0.07);
+  }
+  .bet-btn.result-winner .bet-label { color: var(--green); }
+  .bet-btn.result-winner .bet-odds  { color: var(--green); }
+
+  .match-info-bar {
+    margin: 0 -14px; padding: 9px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .info-bar-pending { color: var(--text3); }
+  .info-bar-win  { background: rgba(0,214,143,0.07); }
+  .info-bar-lose { background: rgba(255,77,106,0.06); }
+  .info-bar-ended { color: var(--text3); }
+
+  .progress-wrap { margin: 0 -14px; }
+  .progress-bar { display: flex; height: 3px; }
+  .progress-home { background: var(--gold); }
+  .progress-away { background: var(--accent); flex: 1; }
+  .progress-labels { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px 12px; font-size: 11px; }
+  .prog-pct-home { color: var(--gold); font-weight: 700; }
+  .prog-pct-away { color: #7EB3FF; font-weight: 700; }
+  .prog-count { color: var(--text3); }
+
+  /* Result crown */
+  .result-crown {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+    background: rgba(0,214,143,0.15); color: var(--green);
+    border-radius: 4px; padding: 1px 5px; margin-top: 3px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title" style="text-align:center">每日竞猜 · 场景状态总览</div>
+
+<!-- ─────────────── STATE 1: 未开始 ─────────────── -->
+<div class="state-label">① 未开始 · 可竞猜</div>
+<div class="match-card">
+  <div class="right-bar"></div>
+  <div class="match-meta">
+    <div class="match-time">今天 22:00 · 小组赛 A组</div>
+    <div class="tag tag-upcoming">即将开始</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap">🇧🇷</div>
+      <div class="team-name">巴西</div>
+      <div class="team-odds-pill">看好 58%</div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text">VS</div>
+      <div class="match-bonus">×2 奖励</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap">🇦🇷</div>
+      <div class="team-name">阿根廷</div>
+      <div class="team-odds-pill">看好 42%</div>
+    </div>
+  </div>
+  <div class="clash-line"></div>
+  <div class="bet-options">
+    <div class="bet-btn"><div class="bet-label">巴西胜</div><div class="bet-odds home">×2</div></div>
+    <div class="bet-btn"><div class="bet-label">平局</div><div class="bet-odds">×2</div></div>
+    <div class="bet-btn"><div class="bet-label">阿根廷胜</div><div class="bet-odds away">×2</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-home" style="width:58%"></div><div class="progress-away"></div></div>
+    <div class="progress-labels">
+      <span class="prog-pct-home">58%</span>
+      <span class="prog-count">参与人数 2,341</span>
+      <span class="prog-pct-away">42%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── STATE 2: 进行中 · 未参与 ─────────────── -->
+<div class="state-label">② 进行中 · 未参与</div>
+<div class="match-card">
+  <div class="right-bar" style="background:linear-gradient(180deg,#FF4D6A,rgba(255,77,106,0.2))"></div>
+  <div class="match-meta">
+    <div class="match-time">今天 22:00 · 小组赛 B组</div>
+    <div class="tag tag-live">🔴 竞猜中</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap">🇩🇪</div>
+      <div class="team-name">德国</div>
+      <div class="team-odds-pill">看好 35%</div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text">VS</div>
+      <div class="match-bonus">×2 奖励</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap">🇫🇷</div>
+      <div class="team-name">法国</div>
+      <div class="team-odds-pill">看好 65%</div>
+    </div>
+  </div>
+  <div class="clash-line"></div>
+  <div class="bet-options">
+    <div class="bet-btn"><div class="bet-label">德国胜</div><div class="bet-odds home">×2</div></div>
+    <div class="bet-btn"><div class="bet-label">平局</div><div class="bet-odds">×2</div></div>
+    <div class="bet-btn"><div class="bet-label">法国胜</div><div class="bet-odds away">×2</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-home" style="width:35%"></div><div class="progress-away"></div></div>
+    <div class="progress-labels">
+      <span class="prog-pct-home">35%</span>
+      <span class="prog-count">参与人数 1,876</span>
+      <span class="prog-pct-away">65%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── STATE 3: 进行中 · 已参与 ─────────────── -->
+<div class="state-label">③ 进行中 · 已参与·等待结果</div>
+<div class="match-card">
+  <div class="right-bar" style="background:linear-gradient(180deg,#FF4D6A,rgba(255,77,106,0.2))"></div>
+  <div class="match-meta">
+    <div class="match-time">今天 22:00 · 小组赛 A组</div>
+    <div class="tag tag-live">🔴 竞猜中</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap">🇧🇷</div>
+      <div class="team-name">巴西</div>
+      <div class="team-odds-pill">看好 58%</div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text">VS</div>
+      <div class="match-bonus">×2 奖励</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap">🇦🇷</div>
+      <div class="team-name">阿根廷</div>
+      <div class="team-odds-pill">看好 42%</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;padding:0 14px 14px;height:72px;">
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.3);border-radius:14px;padding:10px 20px;">
+      <span style="font-size:11px;font-weight:700;color:var(--gold)">✓ 已竞猜</span>
+      <div style="width:1px;height:18px;background:rgba(245,200,66,0.25)"></div>
+      <span style="font-size:15px;font-weight:700;color:var(--text)">巴西胜</span>
+      <span style="font-size:15px;font-weight:800;color:var(--gold)">×2</span>
+    </div>
+  </div>
+  <div class="match-info-bar info-bar-pending">
+    <span>我的竞猜 · 巴西胜</span>
+    <span>投入 <span style="color:var(--gold);font-weight:700">1,000</span> · 猜对可得 <span style="color:var(--green);font-weight:700">+2,000</span></span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-home" style="width:58%"></div><div class="progress-away"></div></div>
+    <div class="progress-labels">
+      <span class="prog-pct-home">58%</span>
+      <span class="prog-count">参与人数 2,341</span>
+      <span class="prog-pct-away">42%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── STATE 4: 已结束 · 未参与 ─────────────── -->
+<div class="state-label">④ 已结束 · 未参与</div>
+<div class="match-card" style="opacity:0.75">
+  <div class="right-bar" style="background:rgba(255,255,255,0.1)"></div>
+  <div class="match-meta">
+    <div class="match-time">昨天 22:00 · 小组赛 C组</div>
+    <div class="tag tag-ended">已结束</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap" style="border-color:rgba(255,255,255,0.1);box-shadow:none">🇪🇸</div>
+      <div class="team-name" style="color:var(--text2)">西班牙</div>
+      <div class="team-odds-pill" style="background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text3)">看好 60%</div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text" style="color:var(--text3);text-shadow:none">VS</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap" style="border-color:rgba(255,255,255,0.1);box-shadow:none">🇵🇹</div>
+      <div class="team-name" style="color:var(--text2)">葡萄牙</div>
+      <div class="team-odds-pill" style="background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text3)">看好 40%</div>
+    </div>
+  </div>
+  <div class="clash-line"></div>
+  <div class="bet-options">
+    <div class="bet-btn result-winner">
+      <div class="bet-label" style="color:var(--green)">西班牙胜</div>
+      <div class="bet-odds" style="color:var(--green)">×2</div>
+      <div style="font-size:9px;color:var(--green);margin-top:3px;font-weight:700">✓ 最终结果</div>
+    </div>
+    <div class="bet-btn disabled"><div class="bet-label">平局</div><div class="bet-odds">×2</div></div>
+    <div class="bet-btn disabled"><div class="bet-label">葡萄牙胜</div><div class="bet-odds away">×2</div></div>
+  </div>
+  <div class="match-info-bar info-bar-ended">
+    <span style="color:var(--text3)">未参与竞猜</span>
+    <span style="color:var(--text3)">西班牙胜 · 已结算</span>
+  </div>
+</div>
+
+<!-- ─────────────── STATE 5: 已结束 · 用户赢了 ─────────────── -->
+<div class="state-label">⑤ 已结束 · 竞猜正确 🎉</div>
+<div class="match-card">
+  <div class="right-bar" style="background:linear-gradient(180deg,var(--green),rgba(0,214,143,0.2))"></div>
+  <div class="match-meta">
+    <div class="match-time">昨天 22:00 · 小组赛 A组</div>
+    <div class="tag tag-win">✓ 竞猜正确</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap" style="border-color:rgba(0,214,143,0.5);box-shadow:0 0 14px rgba(0,214,143,0.2)">🇧🇷</div>
+      <div class="team-name">巴西</div>
+      <div class="team-odds-pill" style="background:rgba(0,214,143,0.12);border-color:rgba(0,214,143,0.3);color:var(--green)">看好 58%</div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text" style="color:var(--green);text-shadow:0 0 12px rgba(0,214,143,0.4)">VS</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap" style="box-shadow:none;opacity:0.5">🇦🇷</div>
+      <div class="team-name" style="color:var(--text3)">阿根廷</div>
+      <div class="team-odds-pill" style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--text3)">看好 42%</div>
+    </div>
+  </div>
+  <div class="clash-line"></div>
+  <div class="bet-options">
+    <div class="bet-btn winner-btn">
+      <div class="bet-chosen-tag win-tag">🏆 猜对了</div>
+      <div class="bet-label" style="color:var(--green)">巴西胜</div>
+      <div class="bet-odds" style="color:var(--green)">×2</div>
+    </div>
+    <div class="bet-btn unchosen"><div class="bet-label">平局</div><div class="bet-odds">×2</div></div>
+    <div class="bet-btn unchosen"><div class="bet-label">阿根廷胜</div><div class="bet-odds away">×2</div></div>
+  </div>
+  <div class="match-info-bar info-bar-win">
+    <span style="color:var(--text2)">我的竞猜 · 巴西胜</span>
+    <span style="color:var(--green);font-weight:700">+2,000 世界币 已发放 🎉</span>
+  </div>
+</div>
+
+<!-- ─────────────── STATE 6: 已结束 · 用户输了 ─────────────── -->
+<div class="state-label">⑥ 已结束 · 竞猜错误</div>
+<div class="match-card">
+  <div class="right-bar" style="background:linear-gradient(180deg,var(--red),rgba(255,77,106,0.2))"></div>
+  <div class="match-meta">
+    <div class="match-time">昨天 22:00 · 小组赛 B组</div>
+    <div class="tag tag-lose">✕ 竞猜错误</div>
+  </div>
+  <div class="match-arena">
+    <div class="team home">
+      <div class="team-flag-wrap" style="border-color:rgba(0,214,143,0.4);box-shadow:0 0 10px rgba(0,214,143,0.15)">🇩🇪</div>
+      <div class="team-name">德国</div>
+      <div class="team-odds-pill" style="background:rgba(0,214,143,0.1);border-color:rgba(0,214,143,0.3);color:var(--green)">
+        최종 결과
+      </div>
+    </div>
+    <div class="vs-center">
+      <div class="vs-text" style="color:var(--text3);text-shadow:none">VS</div>
+    </div>
+    <div class="team away">
+      <div class="team-flag-wrap" style="box-shadow:none;opacity:0.5">🇫🇷</div>
+      <div class="team-name" style="color:var(--text3)">法国</div>
+      <div class="team-odds-pill" style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--text3)">看好 65%</div>
+    </div>
+  </div>
+  <div class="clash-line"></div>
+  <div class="bet-options">
+    <div class="bet-btn loser-btn">
+      <div class="bet-chosen-tag lose-tag">✕ 竞猜错误</div>
+      <div class="bet-label" style="color:var(--red);opacity:0.6">法国胜</div>
+      <div class="bet-odds away" style="color:var(--red);opacity:0.6">×2</div>
+    </div>
+    <div class="bet-btn unchosen"><div class="bet-label">平局</div><div class="bet-odds">×2</div></div>
+    <div class="bet-btn unchosen result-winner">
+      <div style="font-size:9px;color:var(--green);font-weight:700;margin-bottom:2px">✓ 最终结果</div>
+      <div class="bet-label" style="color:var(--green)">德国胜</div>
+      <div class="bet-odds" style="color:var(--green)">×2</div>
+    </div>
+  </div>
+  <div class="match-info-bar info-bar-lose">
+    <span style="color:var(--text2)">我的竞猜 · 法国胜</span>
+    <span style="color:var(--red);font-weight:700">-1,000 世界币 已扣除</span>
+  </div>
+</div>
+
+<div style="margin-top:40px;padding:16px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
+  <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;letter-spacing:1px">状态说明</div>
+  <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text3);line-height:1.6">
+    <div>① <strong style="color:var(--text2)">未开始</strong> — 即将开始标签，三个选项全部可点击</div>
+    <div>② <strong style="color:var(--text2)">进行中·未参与</strong> — 红色竞猜中标签，仍可参与</div>
+    <div>③ <strong style="color:var(--text2)">进行中·已参与</strong> — 已选项金色高亮+「已竞猜」，其余变灰，底部显示投入与预期奖励</div>
+    <div>④ <strong style="color:var(--text2)">已结束·未参与</strong> — 整体变淡，显示最终结果选项</div>
+    <div>⑤ <strong style="color:var(--text2)">竞猜正确</strong> — 绿色高亮+「🏆 猜对了」，底部显示已发放世界币数量</div>
+    <div>⑥ <strong style="color:var(--text2)">竞猜错误</strong> — 红色标注错误选项，高亮正确结果，底部显示扣除数量</div>
+    <div>⑦ <strong style="color:var(--text2)">休赛日</strong> — 无赛事占位，提示下一场时间</div>
+  </div>
+</div>
+
+<div class="state-label">⑦ 休赛日</div>
+<div style="
+  border-radius: 18px;
+  background: #0E1525;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 48px 24px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 10px;
+">
+  <div style="font-size: 44px; line-height: 1; margin-bottom: 4px;">🏟️</div>
+  <div style="font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: 0.5px;">今日休赛</div>
+  <div style="font-size: 13px; color: var(--text3); line-height: 1.7;">
+    赛程间歇，球队养精蓄锐<br>其他任务照常开放，世界币继续赚
+  </div>
+</div>
+
+</body>
+</html>

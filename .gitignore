@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+backups/
+svg-exports/
+页面截图/
+export-svg.mjs
+take_screenshots.mjs
+package.json
+package-lock.json
+figma-plugin/
