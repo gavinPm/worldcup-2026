@@ -200,7 +200,7 @@
     z-index: 10;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 52px 20px 0;
   }
   .topbar-back {
@@ -851,23 +851,28 @@
     padding: 0 14px 14px;
   }
   .progress-bar {
-    height: 8px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 4px;
+    height: 26px;
+    border-radius: 6px;
     overflow: hidden;
     display: flex;
   }
   .progress-home {
     height: 100%;
     background: linear-gradient(90deg, #F5C842, #FFD060);
-    border-radius: 4px 0 0 4px;
-    box-shadow: 0 0 8px rgba(245,200,66,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: rgba(0,0,0,0.65);
+  }
+  .progress-draw {
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7);
   }
   .progress-away {
     height: 100%;
     background: linear-gradient(90deg, #3D7BFF, #6FA0FF);
-    border-radius: 0 4px 4px 0;
-    box-shadow: 0 0 8px rgba(61,123,255,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.9);
   }
   .progress-labels {
     display: flex;
@@ -1894,9 +1899,11 @@
   .checkin-day.today   .checkin-label  { background: rgba(0,214,143,0.2);   color: var(--green); }
   .checkin-day:not(.claimed):not(.today) .checkin-label { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
   .checkin-note {
-    font-size: 11px;
-    color: rgba(255,255,255,0.28);
-    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.40);
+    margin-top: 8px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
 
   /* ── Task row (social / alpha) ── */
@@ -2097,32 +2104,52 @@
   .lb-h-coins, .lb-h-prize { display: none; }
 
   /* ── Records ── */
+  /* H5: 2-column layout (left = time+type, right = amount+balance) */
+  .record-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    background: var(--card2);
+    padding: 8px 16px;
+    margin: 0 -16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    letter-spacing: 0.3px;
+  }
+  .rh-time, .rh-balance { display: none; }
+  .rh-amount { text-align: right; }
   .record-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 0;
+    gap: 12px;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
   .record-row:last-child { border-bottom: none; }
+  .record-cell-left { flex: 1; min-width: 0; }
+  .record-cell-right { text-align: right; flex-shrink: 0; }
   .record-time {
     font-size: 11px;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 2px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 3px;
   }
   .record-desc {
     font-size: 12px;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.75);
     font-weight: 500;
   }
   .record-amount {
     font-size: 13px;
     font-weight: 700;
-    flex-shrink: 0;
-    margin-left: 12px;
+    margin-bottom: 3px;
   }
   .record-amount.positive { color: var(--green); }
   .record-amount.negative { color: var(--red); }
+  .record-balance {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+  }
 
   /* ── Pagination ── */
   .pagination {
@@ -2520,6 +2547,29 @@
     .lb-score > div { margin-top: 0 !important; text-align: right; }
     .lb-score > div:last-child { font-size: 13px !important; }
 
+    /* Record: PC 4-column grid */
+    .record-header {
+      display: grid;
+      grid-template-columns: 96px 1fr 80px 80px;
+      gap: 8px;
+      padding: 8px 20px;
+      margin: 0 -20px;
+    }
+    .rh-time, .rh-balance { display: block; }
+    .rh-amount, .rh-balance { text-align: right; }
+    .rh-type { text-align: left; }
+    .record-row {
+      display: grid;
+      grid-template-columns: 96px 1fr 80px 80px;
+      gap: 8px;
+      padding: 10px 0;
+      align-items: center;
+    }
+    .record-cell-left, .record-cell-right { display: contents; }
+    .record-time { margin-bottom: 0; font-size: 12px; }
+    .record-amount { margin-bottom: 0; font-size: 13px; text-align: right; }
+    .record-balance { font-size: 13px; text-align: right; }
+
     /* Modals: centered dialog */
     .modal-overlay { align-items: center; }
     .modal-sheet {
@@ -2560,14 +2610,10 @@
 
     <!-- Top bar -->
     <div class="hero-topbar">
-      <div class="topbar-back">←</div>
-      <div class="hero-topbar-title" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:1px">世界杯活动</div>
+
       <div class="topbar-icons">
         <div class="topbar-icon topbar-icon-lang" onclick="document.getElementById('langModal').classList.add('open')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </div>
-        <div class="topbar-icon" data-target="sec-rules">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
         </div>
       </div>
     </div>
@@ -2604,7 +2650,7 @@
         </button>
         <button class="btn-hero-outline" id="myRewardBtn" style="display:flex;align-items:center;justify-content:center;gap:5px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          我的奖励
+          我的奖品
         </button>
         <button class="btn-hero-outline" onclick="(function(){var el=document.getElementById('sec-rules');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});})()" style="display:flex;align-items:center;justify-content:center;gap:5px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
@@ -2673,7 +2719,7 @@
         </div>
         <div class="vs-center">
           <div class="vs-text">VS</div>
-          <div class="match-bonus">×2 奖励</div>
+
         </div>
         <div class="team away">
           <div class="team-flag-wrap">
@@ -2697,13 +2743,12 @@
       </div>
       <div class="progress-wrap" style="margin-top:10px">
         <div class="progress-bar">
-          <div class="progress-home" style="width:58%"></div>
-          <div class="progress-away" style="width:42%"></div>
+          <div class="progress-home" style="width:54%">54%</div>
+          <div class="progress-draw" style="width:12%">12%</div>
+          <div class="progress-away" style="width:34%">34%</div>
         </div>
-        <div class="progress-labels">
-          <span class="prog-pct-home">58%</span>
+        <div class="progress-labels" style="justify-content:center">
           <span class="prog-count">参与人数 2,341</span>
-          <span class="prog-pct-away">42%</span>
         </div>
       </div>
     </div>
@@ -2725,7 +2770,7 @@
         </div>
         <div class="vs-center">
           <div class="vs-text">VS</div>
-          <div class="match-bonus">×2 奖励</div>
+
         </div>
         <div class="team away">
           <div class="team-flag-wrap">
@@ -2752,13 +2797,12 @@
       </div>
       <div class="progress-wrap">
         <div class="progress-bar">
-          <div class="progress-home" style="width:35%"></div>
-          <div class="progress-away" style="width:65%"></div>
+          <div class="progress-home" style="width:35%">35%</div>
+          <div class="progress-draw" style="width:18%">18%</div>
+          <div class="progress-away" style="width:47%">47%</div>
         </div>
-        <div class="progress-labels">
-          <span class="prog-pct-home">35%</span>
+        <div class="progress-labels" style="justify-content:center">
           <span class="prog-count">参与人数 1,876</span>
-          <span class="prog-pct-away">65%</span>
         </div>
       </div>
     </div>
@@ -3010,12 +3054,12 @@
       <div class="earn-checkin-cal">
         <div class="checkin-scroll">
           <div class="checkin-day claimed">
-            <div class="checkin-amount">+10</div>
+            <div class="checkin-amount">+20</div>
             <div class="checkin-unit">世界币</div>
             <div class="checkin-label">签到1天</div>
           </div>
           <div class="checkin-day claimed">
-            <div class="checkin-amount">+20</div>
+            <div class="checkin-amount">+10</div>
             <div class="checkin-unit">世界币</div>
             <div class="checkin-label">签到2天</div>
           </div>
@@ -3025,12 +3069,12 @@
             <div class="checkin-label">签到3天</div>
           </div>
           <div class="checkin-day">
-            <div class="checkin-amount">+10</div>
+            <div class="checkin-amount">+20</div>
             <div class="checkin-unit">世界币</div>
             <div class="checkin-label">签到4天</div>
           </div>
           <div class="checkin-day">
-            <div class="checkin-amount">+20</div>
+            <div class="checkin-amount">+10</div>
             <div class="checkin-unit">世界币</div>
             <div class="checkin-label">签到5天</div>
           </div>
@@ -3044,13 +3088,28 @@
             <div class="checkin-unit">世界币</div>
             <div class="checkin-label">签到7天</div>
           </div>
+          <div class="checkin-day">
+            <div class="checkin-amount">+20</div>
+            <div class="checkin-unit">世界币</div>
+            <div class="checkin-label">签到8天</div>
+          </div>
+          <div class="checkin-day">
+            <div class="checkin-amount">+20</div>
+            <div class="checkin-unit">世界币</div>
+            <div class="checkin-label">签到9天</div>
+          </div>
+          <div class="checkin-day">
+            <div class="checkin-amount">+50</div>
+            <div class="checkin-unit">世界币</div>
+            <div class="checkin-label">签到10天</div>
+          </div>
         </div>
-        <div class="checkin-note">连续签到7天循环一次</div>
+        <div class="checkin-note">连续签到10天循环一次 &nbsp;·&nbsp; 每日 <span id="checkinResetTime" style="color:#f0b429;">08:00 美东时间</span> 前未完成签到视为断签，连签天数重置</div>
       </div>
     </div>
 
     <!-- Social tasks -->
-    <div class="earn-group-label">关注社交媒体获取抽奖机会</div>
+    <div class="earn-group-label">关注社交媒体</div>
     <div class="earn-item">
       <div class="earn-item-reward">
         <span class="earn-item-label">社交任务</span>
@@ -3102,9 +3161,12 @@
     <!-- Contract trade tiers -->
     <div class="earn-group-label">合约交易每日任务</div>
     <div class="earn-item" style="flex-direction:column;align-items:stretch">
-      <div class="earn-item-body" style="border-bottom:1px solid var(--border)">
-        <div class="earn-item-title">每日合约交易梯度奖励</div>
-        <div class="earn-item-mob-reward">每翻倍 +100 世界币</div>
+      <div class="earn-item-body" style="border-bottom:1px solid var(--border);display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div class="earn-item-title">每日合约交易梯度奖励</div>
+          <div class="earn-item-mob-reward">每翻倍 +100 世界币</div>
+        </div>
+        <a href="#" style="flex-shrink:0;padding:7px 16px;border-radius:20px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">立即交易</a>
       </div>
       <div class="trade-progress-wrap">
         <!-- 上方：奖励标签 -->
@@ -3252,8 +3314,11 @@
       <div class="section-title">世界币记录</div>
     </div>
 
-    <div class="earn-card" style="padding:0 16px" id="recordList">
-      <!-- JS rendered -->
+    <div class="earn-card" style="padding:0 16px">
+      <div class="record-header">
+        <span class="rh-time">流水时间</span><span class="rh-type">流水类型</span><span class="rh-amount">发生额</span><span class="rh-balance">期末余额</span>
+      </div>
+      <div id="recordList"></div>
     </div>
 
     <!-- Record Pagination -->
@@ -3277,10 +3342,12 @@
     </div>
     <div class="faq-item open">
       <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
-        <div class="faq-question">活动说明</div>
+        <div class="faq-question">什么是世界币？</div>
         <div class="faq-icon">−</div>
       </div>
-      <div class="faq-body"><div class="faq-content">活动时间：2026/06/12 — 07/19。用户通过竞猜赛事、完成每日任务、参与抽奖等方式获取世界币。世界币为活动积分媒介，最终按排行榜排名瓜分 BTC 大奖，另有每日抽奖可赢取多种加密货币。</div></div>
+      <div class="faq-body"><div class="faq-content">
+        世界币是本次活动的专属，可用于比赛竞猜下注和抽奖。世界币不可提现，不可转让，活动结束后自动失效。
+      </div></div>
     </div>
 
     <div class="faq-item">
@@ -3289,61 +3356,90 @@
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        1. 注册用户每日 08:00 赠送 10 世界币，当日未使用次日收回；<br>
-        2. 每日签到可获得 10～50 世界币，连续签到 7 天为一循环，第 7 天 +50；<br>
-        3. 关注 BitTap 官方 X / Telegram、完成指定评论任务，各得 10 世界币（一次性）；<br>
-        4. 每日获取 &gt;10 个合约 Alpha 积分，奖励 10 世界币；<br>
-        5. 邀请好友注册参与活动，可获得额外世界币奖励。
+        · <b>注册即时赠送</b>：注册成功后立即获得当日赠送世界币<br>
+        · <b>每日赠送</b>：每日 08:00（美东时间）自动发放，仅当日有效，次日 08:00 回收未使用部分<br>
+        · <b>连续签到</b>：每日签到可获得世界币，10 天为一个完整周期<br>
+        · <b>社交任务</b>：完成关注 X、评论帖子、加入 Telegram 等任务，各奖励世界币<br>
+        · <b>合约交易梯度奖励</b>：当日有效交易额达到档位门槛后自动发放<br>
+        · <b>竞猜获胜</b>：猜对后按下注时赔率倍数发放（含本金）<br>
+        · <b>抽奖中奖</b>：抽中奖品后直接发放对应世界币
       </div></div>
     </div>
 
     <div class="faq-item">
       <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
-        <div class="faq-question">每日竞猜规则</div>
+        <div class="faq-question">世界币会过期吗？</div>
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        1. 每日开放多场赛事竞猜，选项为主队胜 / 平局 / 客队胜；<br>
-        2. 竞猜截止于对应比赛开始前，提交后不可修改；<br>
-        3. 猜对按选项赔率倍数发放世界币，猜错扣除下注数量的世界币；<br>
-        4. 比赛结果以赛事官方公布为准。
+        每日赠送的世界币仅当日有效，次日 08:00（美东时间）自动回收未使用部分，最多回收当日赠送数量的一半。其他渠道获得的世界币在活动结束前均有效，活动结束后统一失效。
       </div></div>
     </div>
 
     <div class="faq-item">
       <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
-        <div class="faq-question">冠军竞猜规则</div>
+        <div class="faq-question">比赛竞猜规则</div>
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        1. 竞猜 2026 世界杯最终冠军队伍，各队赔率不同；<br>
-        2. 猜对按赔率发放世界币，猜错扣除下注世界币；<br>
-        3. 结果以赛事官方公布为准，结算于冠军揭晓后 24 小时内完成。
+        赛事开始前均可参与竞猜，每位用户每场仅可竞猜一次，提交后不可修改或撤销。<br><br>
+        竞猜金额不得低于当日赠送世界币数量，且不得超过当前余额。<br><br>
+        赛事结束后自动结算：猜对则按竞猜时赔率倍数发放世界币（含本金返还）；猜错则扣除已投入的世界币。
       </div></div>
     </div>
 
     <div class="faq-item">
       <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
-        <div class="faq-question">每日抽奖规则</div>
+        <div class="faq-question">连续签到规则</div>
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        1. 每次抽奖消耗 100 世界币，每日最多抽 3 次；<br>
-        2. 抽奖次数与所需世界币每日 08:00 重置；<br>
-        3. 奖品包含 BTC、ETH、SOL、BNB、USDT、USDC、DOGE 及合约体验金等，概率各异。
+        每日 08:00（美东时间）刷新可签状态，每日仅可签到一次，不支持补签。当日 08:00 前未完成签到视为断签，连签天数重置为第 1 天，从头开始计算。10 天为一个完整周期，第 10 天完成后次日从第 1 天重新循环。
       </div></div>
     </div>
 
     <div class="faq-item">
       <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
-        <div class="faq-question">排行榜奖励</div>
+        <div class="faq-question">社交任务规则</div>
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        活动结束时按累计世界币总量排名，奖励如下：<br>
-        第 1 名：1 BTC　　第 2 名：0.5 BTC　　第 3 名：0.3 BTC<br>
-        第 4 名：0.1 BTC　第 5 名：0.05 BTC<br>
-        奖励于活动结束后 7 个工作日内发放至对应账户。
+        完成后自行点击确认按钮即视为完成，奖励立即发放。<br><br>
+        · <b>关注 BitTap 官方 X</b>：一次性任务，完成后永久有效<br>
+        · <b>关注 BitTap 官方 Telegram</b>：一次性任务，完成后永久有效<br>
+        · <b>评论指定 X 帖子</b>：每日任务，每日可完成一次（每日刷新）
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
+        <div class="faq-question">合约任务规则</div>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-body"><div class="faq-content">
+        以当日有效交易额为依据，达到对应档位门槛后自动发放奖励，无需手动领取。每日 08:00（美东时间）重置，次日重新累计。同一档位当日仅发放一次，已发放档位不重复计算。
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
+        <div class="faq-question">抽奖规则</div>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-body"><div class="faq-content">
+        每次抽奖消耗一定数量的世界币，余额不足时无法参与。每位用户每日抽奖次数有上限，具体以页面显示为准。奖品包含多种加密货币及平台代金券，具体概率以后台配置为准。<br><br>
+        · <b>世界币</b>：即时到账<br>
+        · <b>加密货币 / 代金券</b>：抽奖后即时生成奖励记录，经后台审核通过后发放，结果以站内信通知
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-trigger" onclick="this.closest('.faq-item').classList.toggle('open');this.querySelector('.faq-icon').textContent=this.closest('.faq-item').classList.contains('open')?'−':'+'">
+        <div class="faq-question">排行榜与奖励</div>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-body"><div class="faq-content">
+        排行榜以用户持有的世界币数量进行排名，数据每 15 分钟更新一次。活动结束后，平台对最终排名进行审核，审核通过后 7 天内发放至用户账户，具体时间以站内信通知为准。排行榜奖励不适用于违规用户。
       </div></div>
     </div>
 
@@ -3353,9 +3449,7 @@
         <div class="faq-icon">+</div>
       </div>
       <div class="faq-body"><div class="faq-content">
-        1. 世界币为活动积分，活动结束后清零，不可兑换或提现；<br>
-        2. 严禁刷单、作弊等违规行为，一经发现取消参与资格；<br>
-        3. 本活动最终解释权归 BitTap 平台所有。
+        严禁刷单、自成交、作弊等违规行为，一经发现取消全部参与资格及已获奖励。本活动最终解释权归 BitTap 平台所有。
       </div></div>
     </div>
   </div>
@@ -3443,7 +3537,6 @@
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(255,255,255,0.04);border-radius:10px">
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:50%;background:rgba(247,147,26,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">₿</div>
           <div>
             <div style="font-size:13px;font-weight:600">BTC</div>
             <div style="font-size:11px;color:var(--text3);margin-top:2px">2025-06-14 抽得</div>
@@ -3451,12 +3544,10 @@
         </div>
         <div style="text-align:right">
           <div style="font-size:15px;font-weight:700;color:#F7931A">0.001 BTC</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">≈ $65</div>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(255,255,255,0.04);border-radius:10px">
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:50%;background:rgba(153,69,255,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">◎</div>
           <div>
             <div style="font-size:13px;font-weight:600">SOL</div>
             <div style="font-size:11px;color:var(--text3);margin-top:2px">2025-06-10 抽得</div>
@@ -3464,7 +3555,6 @@
         </div>
         <div style="text-align:right">
           <div style="font-size:15px;font-weight:700;color:#9945FF">1 SOL</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px">≈ $148</div>
         </div>
       </div>
     </div>
@@ -4012,21 +4102,24 @@ function shareToApp(app) {
 // ── Records pagination ──
 (function() {
   var allRecords = [
-    { time: '06/12 20:00', desc: '每日竞猜 · 猜错扣除', amount: '-2,000,000', pos: false },
-    { time: '06/12 18:30', desc: '冠军竞猜奖励',         amount: '+5,000,000', pos: true  },
-    { time: '06/12 10:00', desc: '每日签到',             amount: '+500,000',   pos: true  },
-    { time: '06/12 09:15', desc: '每日竞猜 · 猜错扣除', amount: '-1,000,000', pos: false },
-    { time: '06/12 08:00', desc: '关注X账号',            amount: '+300,000',   pos: true  },
-    { time: '06/11 22:00', desc: '每日竞猜奖励',         amount: '+3,000,000', pos: true  },
-    { time: '06/11 15:30', desc: '每日竞猜 · 猜错扣除', amount: '-500,000',   pos: false },
-    { time: '06/11 10:00', desc: '每日签到',             amount: '+500,000',   pos: true  },
-    { time: '06/11 09:00', desc: '关注Telegram',         amount: '+300,000',   pos: true  },
-    { time: '06/10 22:00', desc: '冠军竞猜奖励',         amount: '+8,000,000', pos: true  },
-    { time: '06/10 18:00', desc: '每日竞猜 · 猜错扣除', amount: '-2,000,000', pos: false },
-    { time: '06/10 10:00', desc: '每日签到',             amount: '+500,000',   pos: true  },
-    { time: '06/09 21:00', desc: '每日竞猜奖励',         amount: '+5,000,000', pos: true  },
-    { time: '06/09 09:00', desc: '邀请好友',             amount: '+1,000,000', pos: true  },
-    { time: '06/08 22:00', desc: '每日竞猜 · 猜错扣除', amount: '-1,500,000', pos: false },
+    { time: '06/12 20:00', desc: '竞猜投入',   amount: '-2,000', pos: false, balance: '3,500'   },
+    { time: '06/12 18:30', desc: '竞猜胜出',   amount: '+5,000', pos: true,  balance: '5,500'   },
+    { time: '06/12 10:00', desc: '连续签到',   amount: '+50',    pos: true,  balance: '500'     },
+    { time: '06/12 09:15', desc: '竞猜投入',   amount: '-1,000', pos: false, balance: '450'     },
+    { time: '06/12 08:00', desc: '社交任务',   amount: '+10',    pos: true,  balance: '1,450'   },
+    { time: '06/11 22:00', desc: '竞猜胜出',   amount: '+3,000', pos: true,  balance: '1,440'   },
+    { time: '06/11 16:00', desc: '抽奖消耗',   amount: '-200',   pos: false, balance: '-1,560'  },
+    { time: '06/11 15:58', desc: '抽奖奖励',   amount: '+500',   pos: true,  balance: '-1,360'  },
+    { time: '06/11 15:30', desc: '竞猜投入',   amount: '-500',   pos: false, balance: '-1,560'  },
+    { time: '06/11 10:00', desc: '连续签到',   amount: '+50',    pos: true,  balance: '-1,060'  },
+    { time: '06/11 08:00', desc: '每日赠送',   amount: '+100',   pos: true,  balance: '-1,110'  },
+    { time: '06/10 22:00', desc: '竞猜胜出',   amount: '+8,000', pos: true,  balance: '-1,210'  },
+    { time: '06/10 18:00', desc: '竞猜投入',   amount: '-2,000', pos: false, balance: '-9,210'  },
+    { time: '06/10 12:00', desc: '合约任务',   amount: '+300',   pos: true,  balance: '-7,210'  },
+    { time: '06/10 10:00', desc: '连续签到',   amount: '+50',    pos: true,  balance: '-7,510'  },
+    { time: '06/09 21:00', desc: '竞猜胜出',   amount: '+5,000', pos: true,  balance: '-7,260'  },
+    { time: '06/09 08:00', desc: '每日赠送',   amount: '+100',   pos: true,  balance: '-12,260' },
+    { time: '06/08 22:00', desc: '竞猜投入',   amount: '-1,500', pos: false, balance: '-12,360' },
   ];
   var PAGE_SIZE = 5;
   var curPage = 1;
@@ -4039,9 +4132,14 @@ function shareToApp(app) {
     var rows = allRecords.slice(start, start + PAGE_SIZE);
     list.innerHTML = rows.map(function(r) {
       return '<div class="record-row">' +
-        '<div><div class="record-time">' + r.time + '</div>' +
-        '<div class="record-desc">' + r.desc + '</div></div>' +
-        '<div class="record-amount ' + (r.pos ? 'positive' : 'negative') + '">' + r.amount + '</div>' +
+        '<div class="record-cell-left">' +
+          '<div class="record-time">' + r.time + '</div>' +
+          '<div class="record-desc">' + r.desc + '</div>' +
+        '</div>' +
+        '<div class="record-cell-right">' +
+          '<div class="record-amount ' + (r.pos ? 'positive' : 'negative') + '">' + r.amount + '</div>' +
+          '<div class="record-balance">' + r.balance + '</div>' +
+        '</div>' +
         '</div>';
     }).join('');
   }
@@ -4203,6 +4301,28 @@ function shareToApp(app) {
   }
   tick();
   setInterval(tick, 1000);
+})();
+
+// ── Checkin reset time: ET 08:00 → local time ──
+(function() {
+  var el = document.getElementById('checkinResetTime');
+  if (!el) return;
+  try {
+    // ET 08:00 = UTC 12:00 (EDT, UTC-4, applies during World Cup June-July)
+    var now = new Date();
+    var utcReset = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0));
+    var localHour = utcReset.getHours();
+    var localMin  = utcReset.getMinutes();
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    var localStr = pad(localHour) + ':' + pad(localMin);
+    // Get local timezone abbreviation
+    var tzName = new Intl.DateTimeFormat('en', { timeZoneName: 'short' })
+      .formatToParts(utcReset)
+      .find(function(p) { return p.type === 'timeZoneName'; });
+    el.textContent = (tzName ? tzName.value : '本地时间') + ' ' + localStr;
+  } catch(e) {
+    el.textContent = '08:00 美东时间';
+  }
 })();
 </script>
 </body>

@@ -48,9 +48,19 @@ body {
 }
 .sidebar-logo-text { font-size: 14px; font-weight: 700; }
 .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-category {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 10px 12px 4px;
+}
+.sidebar-section {
+  font-size: 12px; color: rgba(255,255,255,0.45);
+  padding: 6px 12px 2px 14px;
+  display: flex; align-items: center; gap: 6px;
+}
 .sidebar-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: 8px;
+  padding: 9px 12px 9px 26px; border-radius: 8px;
   font-size: 13px; color: rgba(255,255,255,0.55);
   cursor: pointer; transition: all 0.15s;
 }
@@ -58,7 +68,7 @@ body {
 .sidebar-item.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; }
 
 /* ── MAIN ── */
-.main { flex: 1; overflow-y: auto; padding: 28px 32px 60px; max-width: 1000px; }
+.main { flex: 1; overflow-y: auto; padding: 28px 32px 60px; max-width: 1000px; background: #fff; }
 
 .page { display: none; }
 .page.active { display: block; }
@@ -186,6 +196,31 @@ body {
   outline: none; width: 180px; transition: border-color 0.15s;
 }
 .form-input:focus { border-color: var(--blue); background: #fff; }
+.custom-select { position: relative; }
+.custom-select-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; background: #FAFBFC; cursor: pointer;
+  transition: border-color 0.15s; user-select: none;
+}
+.custom-select-trigger:hover { border-color: #B0B8C8; }
+.custom-select.open .custom-select-trigger { border-color: var(--blue); background: #fff; }
+.custom-select.disabled .custom-select-trigger { opacity: 0.6; cursor: default; pointer-events: none; }
+.custom-select-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  max-height: 300px; overflow-y: auto;
+  z-index: 300; display: none;
+}
+.custom-select.open .custom-select-dropdown { display: block; }
+.custom-select-option {
+  padding: 9px 14px; font-size: 13px; color: var(--text);
+  cursor: pointer; transition: background 0.1s;
+}
+.custom-select-option:hover { background: var(--blue-light); }
+.custom-select-option.selected { color: var(--blue); font-weight: 600; background: var(--blue-light); }
+.custom-select-option[data-value=""] { color: var(--text3); }
 .form-row { display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
 
 .toast {
@@ -237,6 +272,46 @@ body {
   background: var(--green-bg); color: #15803D; border: none; cursor: pointer;
 }
 
+/* ── EDIT DRAWER ── */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.drawer-overlay.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: 660px; background: #fff;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 101;
+}
+.drawer.show { transform: translateX(0); }
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.drawer-header-left { display: flex; flex-direction: column; gap: 2px; }
+.drawer-title { font-size: 16px; font-weight: 700; color: #101828; }
+.drawer-sub { font-size: 12px; color: var(--text3); }
+.drawer-close {
+  background: none; border: none; font-size: 22px; color: var(--text3);
+  cursor: pointer; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; line-height: 1;
+}
+.drawer-close:hover { background: #F0F2F5; color: var(--text); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+.drawer-rest-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; background: #FAFBFC; border: 1px solid var(--border);
+  border-radius: 8px; margin-bottom: 20px;
+}
+.drawer-footer {
+  display: flex; gap: 12px; padding: 16px 24px;
+  border-top: 1px solid var(--border); flex-shrink: 0; background: #fff;
+}
+
 /* ── REVIEW MODAL ── */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.35);
@@ -263,6 +338,9 @@ body {
   color: var(--text3); cursor: pointer; line-height: 1;
 }
 .btn-distribute:hover { background: #D1FAE5; }
+
+.input-error { border-color: var(--red) !important; background: #FFF8F8 !important; }
+.field-error { font-size: 11px; color: var(--red); margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -273,8 +351,10 @@ body {
     <div class="sidebar-logo-text">BitTap 管理</div>
   </div>
   <div class="sidebar-nav">
-    <div class="sidebar-item active" id="nav-activity" onclick="navTo('activity')">⚽ 世界杯活动</div>
-    <div class="sidebar-item" id="nav-reward" onclick="navTo('reward')">🏆 奖励审核</div>
+    <div class="sidebar-category">定制活动</div>
+    <div class="sidebar-section">⚽ 世界杯活动</div>
+    <div class="sidebar-item active" id="nav-activity" onclick="navTo('activity')">活动管理</div>
+    <div class="sidebar-item" id="nav-reward" onclick="navTo('reward')">奖励审核</div>
   </div>
 </div>
 
@@ -290,6 +370,13 @@ body {
     <div class="modal-row"><span class="lbl">奖励</span><span class="val" id="m-reward">—</span></div>
     <div class="modal-row"><span class="lbl">触发时间</span><span class="val" id="m-time">—</span></div>
     <div class="modal-row"><span class="lbl">当前状态</span><span id="m-status">—</span></div>
+    <div style="margin-top:14px;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">备注<span style="color:var(--text3);margin-left:4px;">（选填）</span></div>
+      <textarea id="m-remark" rows="3" placeholder="输入备注内容…"
+        style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#FAFBFC;resize:vertical;outline:none;font-family:inherit;box-sizing:border-box;"
+        onfocus="this.style.borderColor='var(--blue)';this.style.background='#fff'"
+        onblur="this.style.borderColor='var(--border)';this.style.background='#FAFBFC'"></textarea>
+    </div>
     <div class="modal-actions" id="m-actions"></div>
   </div>
 </div>
@@ -306,66 +393,75 @@ body {
       <button class="btn btn-primary" onclick="createNew()">+ 添加日期配置</button>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card highlight"><div class="num">38</div><div class="lbl">总天数</div></div>
-      <div class="stat-card"><div class="num">12</div><div class="lbl">已配置</div></div>
-      <div class="stat-card"><div class="num">3</div><div class="lbl">进行中</div></div>
-    </div>
-
-    <table class="data-table">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="data-table" style="border:none;border-radius:0;">
       <thead>
-        <tr><th>日期</th><th>赛事</th><th>每日赠送</th><th>抽奖次数</th><th>抽奖消耗</th><th>状态</th><th></th></tr>
+        <tr><th>日期</th><th>休赛日</th><th>赛事</th><th>每日赠送</th><th>抽奖次数</th><th>抽奖消耗</th><th>状态</th><th></th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td style="font-weight:600">06/13 周六</td>
+        <tr data-date="06/13">
+          <td><div style="font-weight:600">06/13 周六</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
+          <td style="color:var(--text3)">—</td>
           <td><div class="match-tags"><span class="match-tag">巴西 vs 阿根廷</span><span class="match-tag">德国 vs 法国</span></div></td>
           <td>10 世界币</td><td>3 次</td><td>100</td>
-          <td><span class="status today">● 今天</span></td>
+          <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/13')">编辑</button></td>
         </tr>
-        <tr>
-          <td style="font-weight:600">06/14 周日</td>
+        <tr data-date="06/14">
+          <td><div style="font-weight:600">06/14 周日</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
+          <td style="color:var(--text3)">—</td>
           <td><div class="match-tags"><span class="match-tag">西班牙 vs 葡萄牙</span><span class="match-tag">荷兰 vs 比利时</span></div></td>
           <td>10 世界币</td><td>3 次</td><td>100</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/14')">编辑</button></td>
         </tr>
-        <tr>
-          <td style="font-weight:600">06/15 周一</td>
+        <tr data-date="06/15">
+          <td><div style="font-weight:600">06/15 周一</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
+          <td style="color:var(--text3)">—</td>
           <td><div class="match-tags"><span class="match-tag">英格兰 vs 意大利</span></div></td>
           <td>15 世界币</td><td>5 次</td><td>80</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/15')">编辑</button></td>
         </tr>
-        <tr>
-          <td style="font-weight:600">06/16 周二</td>
-          <td><div class="match-tags"><span class="match-tag" style="color:var(--text3)">未配置</span></div></td>
+        <tr data-date="06/17">
+          <td><div style="font-weight:600">06/17 周三</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
+          <td><span class="status rest" style="font-size:12px">◌ 是</span></td>
+          <td style="color:var(--text3)">—</td>
           <td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td>
-          <td><span class="status pending">○ 待配置</span></td>
-          <td><button class="btn-ghost-sm" onclick="editDay('06/16', false)">编辑</button></td>
-        </tr>
-        <tr style="opacity:0.6">
-          <td style="font-weight:600">06/17 周三</td>
-          <td><div class="match-tags"><span class="match-tag" style="color:var(--text3)">—</span></div></td>
-          <td style="color:var(--text3)">10 世界币</td><td style="color:var(--text3)">3 次</td><td style="color:var(--text3)">100</td>
-          <td><span class="status rest">◌ 休赛日</span></td>
+          <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/17', true)">编辑</button></td>
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 
-  <!-- ═══════════ 编辑页 ═══════════ -->
-  <div class="page" id="pageEdit">
-    <div class="edit-header">
-      <span class="back-link" onclick="goToList()">← 返回列表</span>
+<!-- ═══════════ 编辑抽屉 ═══════════ -->
+<div class="drawer-overlay" id="editOverlay" onclick="closeDrawer(event)"></div>
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <div class="drawer-header-left">
+      <div class="drawer-title" id="drawerTitle">配置日期</div>
+      <div class="drawer-sub">配置该日 08:00 生效（美国东部时间 / 北京时间 20:00）</div>
     </div>
-    <div class="edit-date-bar">
-      <label>配置日期</label>
-      <input id="editDate" value="06/13" placeholder="例: 06/13">
-      <span style="font-size:12px;color:var(--text3)">配置该日 00:00 生效</span>
-      <label style="display:flex;align-items:center;gap:6px;margin-left:24px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;">
+    <button class="drawer-close" onclick="goToList()">×</button>
+  </div>
+  <div class="drawer-body">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+      <div class="form-group" style="flex-shrink:0">
+        <div class="form-label">配置日期</div>
+        <div class="custom-select" id="dateSelectWrap" style="width:160px">
+          <div class="custom-select-trigger" id="dateSelectTrigger" onclick="toggleDateSelect()">
+            <span id="dateSelectLabel" style="color:var(--text3)">请选择日期</span>
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#98A2B3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="custom-select-dropdown" id="dateSelectDropdown">
+            <div class="custom-select-option" data-value="" onclick="selectDate(this)">请选择日期</div>
+          </div>
+        </div>
+        <input type="hidden" id="editDate">
+      </div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;padding-top:20px;">
         <input type="checkbox" id="isRestDay" onchange="toggleRestDay(this.checked)" style="width:15px;height:15px;cursor:pointer;">
         休赛日（无赛事）
       </label>
@@ -401,12 +497,12 @@ body {
     </div>
 
     <!-- 模块2: 每日社交任务 -->
-    <div class="card">
+    <div class="card" id="socialCard">
       <div class="card-title">每日社交任务<span class="card-subtitle">当日开放的 X 评论任务</span></div>
       <div class="form-group">
         <div class="form-label">X 帖子链接</div>
         <div class="form-hint">用户需在该帖子下评论，完成后得 +10 世界币</div>
-        <input class="form-input" id="xPostUrl" type="url" placeholder="https://x.com/BitTap/status/..." style="width:420px">
+        <input class="form-input" id="xPostUrl" type="url" placeholder="https://x.com/BitTap/status/..." style="width:100%;max-width:420px">
       </div>
     </div>
 
@@ -421,7 +517,7 @@ body {
     </div>
 
     <!-- 模块4: 抽奖配置 -->
-    <div class="card">
+    <div class="card" id="lotteryCard">
       <div class="card-title">每日抽奖<span class="card-subtitle">08:00 重置</span></div>
       <div class="form-row">
         <div class="form-group">
@@ -436,12 +532,13 @@ body {
         </div>
       </div>
     </div>
-
-    <div class="footer-actions">
-      <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
-      <button class="btn btn-outline" onclick="goToList()">取消</button>
-    </div>
   </div>
+
+  <div class="drawer-footer">
+    <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+    <button class="btn btn-outline" onclick="goToList()">取消</button>
+  </div>
+</div>
 
   <!-- ═══════════ 奖励审核页 ═══════════ -->
   <div class="page" id="pageReward">
@@ -450,62 +547,116 @@ body {
         <div class="page-title">奖励审核</div>
         <div class="page-sub">排行榜 BTC 奖励 · 抽奖发币审核</div>
       </div>
+      <button class="btn btn-primary" onclick="batchDistribute()">批量发放</button>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card highlight"><div class="num">7</div><div class="lbl">待审核</div></div>
-      <div class="stat-card"><div class="num">23</div><div class="lbl">已批准</div></div>
-      <div class="stat-card"><div class="num">18</div><div class="lbl">已发放</div></div>
-      <div class="stat-card"><div class="num">2</div><div class="lbl">已拒绝</div></div>
+    <!-- 筛选栏 -->
+    <div id="block-filter" style="border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div class="form-group" style="min-width:140px;">
+          <div class="form-label" style="font-size:12px;margin-bottom:4px;">状态</div>
+          <select id="rewardStatusSelect" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#FAFBFC;outline:none;width:140px;">
+            <option value="all">全部</option>
+            <option value="reviewing">待审核</option>
+            <option value="approved">已通过</option>
+            <option value="distributed">已发放</option>
+            <option value="rejected">已拒绝</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:120px;">
+          <div class="form-label" style="font-size:12px;margin-bottom:4px;">来源</div>
+          <select id="rewardSourceSelect" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#FAFBFC;outline:none;width:120px;">
+            <option value="all">全部</option>
+            <option value="lottery">抽奖</option>
+            <option value="leaderboard">排行榜</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:160px;">
+          <div class="form-label" style="font-size:12px;margin-bottom:4px;">UID</div>
+          <input id="rewardUidSearch" type="text" placeholder="输入 UID"
+            style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#FAFBFC;outline:none;width:160px;">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button class="btn btn-primary" onclick="filterRewardTable()">搜索</button>
+        <button class="btn btn-outline" onclick="resetRewardFilter()">重置</button>
+      </div>
     </div>
 
-    <table class="data-table">
+    <div id="block-table" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow-x:auto;">
+    <table class="data-table" style="border:none;border-radius:0;min-width:1100px;" id="rewardTable">
       <thead>
-        <tr><th>用户</th><th>来源</th><th>奖励</th><th>触发时间</th><th>状态</th><th>操作</th></tr>
+        <tr><th>用户</th><th>来源</th><th>奖励</th><th>生成时间</th><th>审核人</th><th>审核时间</th><th>发放人</th><th>发放时间</th><th>备注</th><th>状态</th><th>操作</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><div style="font-weight:600">0x3f…a1b2</div><div style="font-size:12px;color:var(--text3)">UID 10023</div></td>
+        <tr data-status="reviewing" data-source="leaderboard">
+          <td style="color:var(--text3)">10023</td>
           <td><span class="match-tag">排行榜</span></td>
           <td style="font-weight:700;color:#B45309">1 BTC</td>
-          <td style="color:var(--text3)">07/19 结算</td>
+          <td style="color:var(--text3)">07/19 00:00</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
           <td><span class="status reviewing">● 待审核</span></td>
           <td><button class="btn-ghost-sm" onclick="openReview(this, 'reviewing')">审核</button></td>
         </tr>
-        <tr>
-          <td><div style="font-weight:600">0x8c…d4e5</div><div style="font-size:12px;color:var(--text3)">UID 10087</div></td>
+        <tr data-status="reviewing" data-source="leaderboard">
+          <td style="color:var(--text3)">10087</td>
           <td><span class="match-tag">排行榜</span></td>
           <td style="font-weight:700;color:#B45309">0.5 BTC</td>
-          <td style="color:var(--text3)">07/19 结算</td>
+          <td style="color:var(--text3)">07/19 00:00</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
           <td><span class="status reviewing">● 待审核</span></td>
           <td><button class="btn-ghost-sm" onclick="openReview(this, 'reviewing')">审核</button></td>
         </tr>
-        <tr>
-          <td><div style="font-weight:600">0x1a…9f3c</div><div style="font-size:12px;color:var(--text3)">UID 10156</div></td>
+        <tr data-status="approved" data-source="lottery">
+          <td style="color:var(--text3)">10156</td>
           <td><span class="match-tag">抽奖</span></td>
           <td style="font-weight:600">0.001 BTC</td>
           <td style="color:var(--text3)">06/15 08:32</td>
-          <td><span class="status approved">✓ 已批准</span></td>
-          <td><button class="btn-ghost-sm" onclick="openReview(this, 'approved')">审核</button></td>
+          <td>op_admin</td>
+          <td style="color:var(--text3)">06/15 09:10</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td><span class="status approved">✓ 已通过</span></td>
+          <td style="color:var(--text3)">—</td>
         </tr>
-        <tr>
-          <td><div style="font-weight:600">0x7d…b2a0</div><div style="font-size:12px;color:var(--text3)">UID 10201</div></td>
+        <tr data-status="distributed" data-source="lottery">
+          <td style="color:var(--text3)">10201</td>
           <td><span class="match-tag">抽奖</span></td>
           <td style="font-weight:600">10 USDT</td>
           <td style="color:var(--text3)">06/13 21:14</td>
+          <td>op_admin</td>
+          <td style="color:var(--text3)">06/13 22:05</td>
+          <td>op_dist</td>
+          <td style="color:var(--text3)">06/13 22:30</td>
+          <td style="color:var(--text3)">用户已核实</td>
           <td><span class="status distributed">✓ 已发放</span></td>
           <td style="color:var(--text3)">—</td>
         </tr>
-        <tr>
-          <td><div style="font-weight:600">0x2e…c8d1</div><div style="font-size:12px;color:var(--text3)">UID 10334</div></td>
+        <tr data-status="rejected" data-source="lottery">
+          <td style="color:var(--text3)">10334</td>
           <td><span class="match-tag">抽奖</span></td>
           <td style="font-weight:600">0.01 ETH</td>
           <td style="color:var(--text3)">06/14 19:55</td>
+          <td>op_admin</td>
+          <td style="color:var(--text3)">06/14 20:30</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">--</td>
+          <td style="color:var(--text3)">账号异常，拒绝发放</td>
           <td><span class="status rejected">✗ 已拒绝</span></td>
           <td style="color:var(--text3)">—</td>
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 
 </div>
@@ -515,10 +666,131 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
 }
-function goToList() { showPage('pageList'); }
+
+// 初始化自定义日期选择（活动期 06/12—07/19）
+(function initDateSelect() {
+  var dropdown = document.getElementById('dateSelectDropdown');
+  var start = new Date(2026, 5, 12);
+  var end   = new Date(2026, 6, 19);
+  for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    var val = (m < 10 ? '0' + m : m) + '/' + (day < 10 ? '0' + day : day);
+    var div = document.createElement('div');
+    div.className = 'custom-select-option';
+    div.setAttribute('data-value', val);
+    div.textContent = '美东 ' + m + '/' + day;
+    div.setAttribute('onclick', 'selectDate(this)');
+    dropdown.appendChild(div);
+  }
+})();
+
+function toggleDateSelect() {
+  var wrap = document.getElementById('dateSelectWrap');
+  wrap.classList.toggle('open');
+}
+function selectDate(el) {
+  var val = el.getAttribute('data-value');
+  document.getElementById('editDate').value = val;
+  document.getElementById('dateSelectLabel').textContent = val ? '美东 ' + val.replace(/^0/, '').replace(/\/0/, '/') : '请选择日期';
+  document.getElementById('dateSelectLabel').style.color = val ? 'var(--text)' : 'var(--text3)';
+  document.querySelectorAll('.custom-select-option').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('dateSelectWrap').classList.remove('open');
+}
+// 点击外部关闭
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('dateSelectWrap');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
+
+// 已配置日期列表（从列表行读取）
+function getConfiguredDates() {
+  var dates = [];
+  document.querySelectorAll('#pageList tbody tr').forEach(function(tr) {
+    var d = tr.getAttribute('data-date');
+    if (d) dates.push(d);
+  });
+  return dates;
+}
+
+var _editingDate = null; // null = 新增，否则为正在编辑的日期
+
+function openDrawer(date, isRest) {
+  _editingDate = date || null;
+  document.getElementById('drawerTitle').textContent = date ? date + ' 配置' : '新增配置';
+  var dateInput = document.getElementById('editDate');
+  var wrap = document.getElementById('dateSelectWrap');
+  var label = document.getElementById('dateSelectLabel');
+  if (date) {
+    dateInput.value = date;
+    label.textContent = '美东 ' + date.replace(/^0/, '').replace(/\/0/, '/');
+    label.style.color = 'var(--text)';
+    wrap.classList.add('disabled');
+  } else {
+    dateInput.value = '';
+    label.textContent = '请选择日期';
+    label.style.color = 'var(--text3)';
+    wrap.classList.remove('disabled');
+    document.querySelectorAll('.custom-select-option').forEach(function(o){ o.classList.remove('selected'); });
+  }
+  var rest = !!isRest;
+  document.getElementById('isRestDay').checked = rest;
+  toggleRestDay(rest);
+  clearErrors();
+  document.getElementById('editOverlay').classList.add('show');
+  document.getElementById('editDrawer').classList.add('show');
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(function(el){ el.remove(); });
+  document.querySelectorAll('.input-error').forEach(function(el){ el.classList.remove('input-error'); });
+}
+
+function showError(inputEl, msg) {
+  inputEl.classList.add('input-error');
+  var err = document.createElement('div');
+  err.className = 'field-error';
+  err.textContent = msg;
+  inputEl.parentNode.appendChild(err);
+}
+function goToList() {
+  document.getElementById('editOverlay').classList.remove('show');
+  document.getElementById('editDrawer').classList.remove('show');
+}
+function closeDrawer(e) {
+  if (e.target === document.getElementById('editOverlay')) goToList();
+}
 window.addEventListener('DOMContentLoaded', function() {
-  var p = new URLSearchParams(location.search).get('page');
+  var params = new URLSearchParams(location.search);
+  var p = params.get('page');
+  var embed = params.get('embed');
   if (p) navTo(p);
+  if (embed) {
+    // embed mode: hide sidebar, remove body padding bg, show only target block
+    document.querySelector('.sidebar').style.display = 'none';
+    document.querySelector('.main').style.maxWidth = 'none';
+    document.querySelector('.main').style.padding = '20px 24px';
+    document.body.style.background = '#fff';
+    if (embed === 'modal') {
+      // auto-open review modal with sample data
+      showPage('pageReward');
+      document.getElementById('m-user').textContent = '10023';
+      document.getElementById('m-source').textContent = '排行榜';
+      document.getElementById('m-reward').textContent = '1 BTC';
+      document.getElementById('m-time').textContent = '07/19 00:00';
+      document.getElementById('m-status').innerHTML = '<span class="status reviewing">● 待审核</span>';
+      document.getElementById('m-actions').innerHTML =
+        '<button class="btn-approve" onclick="approve()">通过</button>' +
+        '<button class="btn-reject" onclick="reject()">拒绝</button>';
+      document.getElementById('reviewOverlay').classList.add('show');
+    } else if (embed === 'filter') {
+      showPage('pageReward');
+      document.getElementById('block-table').style.display = 'none';
+      document.querySelector('#pageReward .page-header').style.display = 'none';
+    }
+    // embed=list (default): show full reward page, no sidebar
+  }
 });
 function navTo(section) {
   document.querySelectorAll('.sidebar-item').forEach(function(el){ el.classList.remove('active'); });
@@ -530,11 +802,25 @@ function navTo(section) {
     showPage('pageList');
   }
 }
-function switchTab(el, type) {
-  document.querySelectorAll('.reward-tab').forEach(function(t){ t.classList.remove('active'); });
-  el.classList.add('active');
+function filterRewardTable() {
+  var status = document.getElementById('rewardStatusSelect').value;
+  var source = document.getElementById('rewardSourceSelect').value;
+  var uid = (document.getElementById('rewardUidSearch').value || '').trim().toLowerCase();
+  document.querySelectorAll('#rewardTable tbody tr').forEach(function(tr) {
+    var statusMatch = status === 'all' || tr.getAttribute('data-status') === status;
+    var sourceMatch = source === 'all' || tr.getAttribute('data-source') === source;
+    var uidMatch = !uid || tr.cells[0].innerText.toLowerCase().indexOf(uid) !== -1;
+    tr.style.display = (statusMatch && sourceMatch && uidMatch) ? '' : 'none';
+  });
+}
+function resetRewardFilter() {
+  document.getElementById('rewardStatusSelect').value = 'all';
+  document.getElementById('rewardSourceSelect').value = 'all';
+  document.getElementById('rewardUidSearch').value = '';
+  filterRewardTable();
 }
 var _currentRow = null;
+// 列索引：0=UID 1=来源 2=奖励 3=生成时间 4=审核人 5=审核时间 6=发放人 7=发放时间 8=备注 9=状态 10=操作
 function openReview(btn, state) {
   _currentRow = btn.closest('tr');
   var cells = _currentRow.cells;
@@ -542,12 +828,14 @@ function openReview(btn, state) {
   document.getElementById('m-source').textContent = cells[1].innerText.trim();
   document.getElementById('m-reward').textContent = cells[2].innerText.trim();
   document.getElementById('m-time').textContent = cells[3].innerText.trim();
-  document.getElementById('m-status').innerHTML = cells[4].innerHTML;
+  document.getElementById('m-status').innerHTML = cells[9].innerHTML;
   var actions = document.getElementById('m-actions');
   if (state === 'reviewing') {
-    actions.innerHTML = '<button class="btn-approve" onclick="approve()">通过</button><button class="btn-reject" onclick="reject()">拒绝</button>';
+    actions.innerHTML =
+      '<button class="btn-approve" onclick="approve()">通过</button>' +
+      '<button class="btn-reject" onclick="reject()">拒绝</button>';
   } else if (state === 'approved') {
-    actions.innerHTML = '<button class="btn-distribute" onclick="distribute()">标记已发放</button>';
+    actions.innerHTML = '<button class="btn-distribute" onclick="distribute()">发放</button>';
   } else {
     actions.innerHTML = '';
   }
@@ -555,38 +843,48 @@ function openReview(btn, state) {
 }
 function closeReviewModal() {
   document.getElementById('reviewOverlay').classList.remove('show');
+  document.getElementById('m-remark').value = '';
 }
 function closeReview(e) {
   if (e.target === document.getElementById('reviewOverlay')) closeReviewModal();
 }
 function approve() {
-  _currentRow.cells[4].innerHTML = '<span class="status approved">✓ 已批准</span>';
-  _currentRow.cells[5].innerHTML = '<button class="btn-ghost-sm" onclick="openReview(this,\'approved\')">审核</button>';
+  _currentRow.setAttribute('data-status', 'approved');
+  _currentRow.cells[8].textContent = document.getElementById('m-remark').value || '--';
+  _currentRow.cells[9].innerHTML = '<span class="status approved">✓ 已通过</span>';
+  _currentRow.cells[10].innerHTML = '<span style="color:var(--text3)">—</span>';
   closeReviewModal();
 }
 function reject() {
-  _currentRow.cells[4].innerHTML = '<span class="status rejected">✗ 已拒绝</span>';
-  _currentRow.cells[5].innerHTML = '<span style="color:var(--text3)">—</span>';
+  _currentRow.setAttribute('data-status', 'rejected');
+  _currentRow.cells[8].textContent = document.getElementById('m-remark').value || '--';
+  _currentRow.cells[9].innerHTML = '<span class="status rejected">✗ 已拒绝</span>';
+  _currentRow.cells[10].innerHTML = '<span style="color:var(--text3)">—</span>';
   closeReviewModal();
+}
+function _doDistribute(row) {
+  var now = new Date();
+  var mm = String(now.getMonth()+1).padStart(2,'0');
+  var dd = String(now.getDate()).padStart(2,'0');
+  var hh = String(now.getHours()).padStart(2,'0');
+  var mi = String(now.getMinutes()).padStart(2,'0');
+  row.setAttribute('data-status', 'distributed');
+  row.cells[6].textContent = 'op_dist';
+  row.cells[7].textContent = mm+'/'+dd+' '+hh+':'+mi;
+  row.cells[9].innerHTML = '<span class="status distributed">✓ 已发放</span>';
+  row.cells[10].innerHTML = '<span style="color:var(--text3)">—</span>';
+}
+function batchDistribute() {
+  var rows = document.querySelectorAll('#rewardTable tbody tr[data-status="approved"]');
+  if (!rows.length) { alert('暂无已通过待发放的记录'); return; }
+  rows.forEach(function(tr) { _doDistribute(tr); });
 }
 function distribute() {
-  _currentRow.cells[4].innerHTML = '<span class="status distributed">✓ 已发放</span>';
-  _currentRow.cells[5].innerHTML = '<span style="color:var(--text3)">—</span>';
+  _doDistribute(_currentRow);
   closeReviewModal();
 }
-function editDay(date, isRest) {
-  document.getElementById('editDate').value = date;
-  var rest = !!isRest;
-  document.getElementById('isRestDay').checked = rest;
-  toggleRestDay(rest);
-  showPage('pageEdit');
-}
-function createNew() {
-  document.getElementById('editDate').value = '';
-  document.getElementById('isRestDay').checked = false;
-  toggleRestDay(false);
-  showPage('pageEdit');
-}
+function editDay(date, isRest) { openDrawer(date, isRest); }
+function createNew() { openDrawer('', false); }
 function toggleRestDay(isRest) {
   document.getElementById('matchCard').style.display = isRest ? 'none' : 'block';
 }
@@ -610,10 +908,51 @@ function removeMatch(b) {
 }
 
 function saveConfig() {
+  clearErrors();
+  var ok = true;
+  var dateInput = document.getElementById('editDate');
+  var isRest = document.getElementById('isRestDay').checked;
+
+  // 日期校验（新增模式）
+  if (!_editingDate) {
+    if (!dateInput.value) {
+      showError(dateInput, '请选择日期');
+      ok = false;
+    } else {
+      var picked = dateInput.value; // already "MM/DD"
+      var configured = getConfiguredDates();
+      if (configured.indexOf(picked) !== -1) {
+        showError(dateInput, '该日期已配置，请重新选择');
+        ok = false;
+      }
+    }
+  }
+
+  // 非休赛日：至少一场赛事
+  if (!isRest) {
+    var rows = document.getElementById('matchTbody').rows;
+    if (rows.length === 0) {
+      var addBtn = document.querySelector('#matchCard .btn-row');
+      var err = document.createElement('div');
+      err.className = 'field-error';
+      err.textContent = '请至少添加一场比赛';
+      addBtn.appendChild(err);
+      ok = false;
+    }
+  }
+
+  // 必填数字字段
+  [['dailyCoin','请填写赠送数量'],['maxDraws','请填写次数上限'],['drawCost','请填写消耗数量']].forEach(function(pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el.value || Number(el.value) <= 0) { showError(el, pair[1]); ok = false; }
+  });
+
+  if (!ok) return;
+
   var toast = document.getElementById('toast');
   toast.classList.add('show');
   setTimeout(function(){ toast.classList.remove('show'); }, 2000);
-  setTimeout(function(){ goToList(); }, 800);
+  setTimeout(function(){ goToList(); }, 600);
 }
 </script>
 
