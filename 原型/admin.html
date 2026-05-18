@@ -396,38 +396,30 @@ body {
     <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
     <table class="data-table" style="border:none;border-radius:0;">
       <thead>
-        <tr><th>日期</th><th>休赛日</th><th>赛事</th><th>每日赠送</th><th>抽奖次数</th><th>抽奖消耗</th><th>状态</th><th></th></tr>
+        <tr><th>日期</th><th>竞猜成功倍数</th><th>竞猜失败倍数</th><th>每日赠送</th><th>抽奖次数</th><th>抽奖消耗</th><th>状态</th><th></th></tr>
       </thead>
       <tbody>
         <tr data-date="06/13">
           <td><div style="font-weight:600">06/13 周六</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
-          <td style="color:var(--text3)">—</td>
-          <td><div class="match-tags"><span class="match-tag">巴西 vs 阿根廷</span><span class="match-tag">德国 vs 法国</span></div></td>
-          <td>10 世界币</td><td>3 次</td><td>100</td>
+          <td>×3</td><td>×2</td><td>10 世界币</td><td>3 次</td><td>100</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/13')">编辑</button></td>
         </tr>
         <tr data-date="06/14">
           <td><div style="font-weight:600">06/14 周日</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
-          <td style="color:var(--text3)">—</td>
-          <td><div class="match-tags"><span class="match-tag">西班牙 vs 葡萄牙</span><span class="match-tag">荷兰 vs 比利时</span></div></td>
-          <td>10 世界币</td><td>3 次</td><td>100</td>
+          <td>×3</td><td>×2</td><td>10 世界币</td><td>3 次</td><td>100</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/14')">编辑</button></td>
         </tr>
         <tr data-date="06/15">
           <td><div style="font-weight:600">06/15 周一</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
-          <td style="color:var(--text3)">—</td>
-          <td><div class="match-tags"><span class="match-tag">英格兰 vs 意大利</span></div></td>
-          <td>15 世界币</td><td>5 次</td><td>80</td>
+          <td>×3</td><td>×2</td><td>15 世界币</td><td>5 次</td><td>80</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/15')">编辑</button></td>
         </tr>
         <tr data-date="06/17">
           <td><div style="font-weight:600">06/17 周三</div><div style="font-size:11px;color:var(--text3);margin-top:2px">美国东部时间</div></td>
-          <td><span class="status rest" style="font-size:12px">◌ 是</span></td>
-          <td style="color:var(--text3)">—</td>
-          <td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td>
+          <td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td>
           <td><span class="status done">✓ 已配置</span></td>
           <td><button class="btn-ghost-sm" onclick="editDay('06/17', true)">编辑</button></td>
         </tr>
@@ -461,38 +453,20 @@ body {
         </div>
         <input type="hidden" id="editDate">
       </div>
-      <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;padding-top:20px;">
-        <input type="checkbox" id="isRestDay" onchange="toggleRestDay(this.checked)" style="width:15px;height:15px;cursor:pointer;">
-        休赛日（无赛事）
-      </label>
     </div>
 
     <!-- 模块1: 赛事 -->
     <div class="card" id="matchCard">
       <div class="card-title">每日赛事<span class="card-subtitle">该日开放的竞猜比赛</span></div>
-      <table class="match-table">
-        <thead>
-          <tr><th>赛程</th><th>主胜赔率</th><th>平局赔率</th><th>客胜赔率</th><th></th></tr>
-        </thead>
-        <tbody id="matchTbody">
-          <tr>
-            <td><select class="match-select" onchange="syncOdds(this)"><option>巴西 vs 阿根廷</option><option>德国 vs 法国</option><option>西班牙 vs 葡萄牙</option><option>荷兰 vs 比利时</option><option>英格兰 vs 意大利</option><option>巴西 vs 法国</option><option>阿根廷 vs 德国</option><option>英格兰 vs 葡萄牙</option><option>西班牙 vs 巴西</option><option>日本 vs 韩国</option><option>美国 vs 墨西哥</option><option>摩洛哥 vs 塞内加尔</option></select></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>
-          </tr>
-          <tr>
-            <td><select class="match-select" onchange="syncOdds(this)"><option>巴西 vs 阿根廷</option><option selected>德国 vs 法国</option><option>西班牙 vs 葡萄牙</option><option>荷兰 vs 比利时</option><option>英格兰 vs 意大利</option><option>巴西 vs 法国</option><option>阿根廷 vs 德国</option><option>英格兰 vs 葡萄牙</option><option>西班牙 vs 巴西</option><option>日本 vs 韩国</option><option>美国 vs 墨西哥</option><option>摩洛哥 vs 塞内加尔</option></select></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><input class="odds-input" value="×2"></td>
-            <td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="btn-row">
-        <button class="btn btn-outline" onclick="addMatch()">+ 添加比赛</button>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;margin-top:8px">
+        <div class="form-group" style="margin:0">
+          <div class="form-label">预测成功奖励倍数</div>
+          <input class="form-input" type="number" value="3" min="1" style="width:120px;margin-top:8px">
+        </div>
+        <div class="form-group" style="margin:0">
+          <div class="form-label">预测失败奖励倍数</div>
+          <input class="form-input" type="number" value="2" min="1" style="width:120px;margin-top:8px">
+        </div>
       </div>
     </div>
 
@@ -897,7 +871,7 @@ function addMatch() {
   var t = document.getElementById('matchTbody');
   var r = document.createElement('tr');
   r.innerHTML = '<td><select class="match-select" onchange="syncOdds(this)">'+matchOptions()+'</select></td>' +
-    '<td><input class="odds-input"></td><td><input class="odds-input"></td><td><input class="odds-input"></td>' +
+    '<td><input class="odds-input" value="×3"></td><td><input class="odds-input" value="×2"></td>' +
     '<td><button class="btn-danger" onclick="removeMatch(this)">删除</button></td>';
   t.appendChild(r);
 }

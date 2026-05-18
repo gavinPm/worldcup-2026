@@ -396,12 +396,15 @@
 
   /* My stats bar */
   .hero-mystats {
-    width: 100%;
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
     display: flex;
-    border-top: 1px solid rgba(255,255,255,0.07);
-    padding-top: 14px;
-    padding-bottom: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 14px 0;
     gap: 0;
+    backdrop-filter: blur(8px);
   }
   .mystat {
     flex: 1;
@@ -2408,13 +2411,19 @@
     }
     .tab-pill { font-size: 13px; padding: 8px 20px; }
 
-    /* Match cards: 2-column grid */
+    /* Match cards: ticker — full viewport width, no padding/max-width cap */
     .section#sec-match {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 16px;
+      display: block;
+      max-width: none;
+      padding-left: 0;
+      padding-right: 0;
     }
-    .section#sec-match .section-header { grid-column: 1 / -1; }
+    .predict-head-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px 14px;
+    }
+    .predict-ticker-wrap { margin: 0; }
 
     /* Champion: narrower card, button inside card */
     .champ-viewport { height: 380px; }
@@ -2580,6 +2589,158 @@
     }
     .modal-overlay.open .modal-sheet { transform: none; }
   }
+
+  /* ── 每日竞猜 ticker ── */
+  .predict-ticker-wrap {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0 -16px;
+  }
+  .predict-track-outer {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+  }
+  .predict-track-outer::before,
+  .predict-track-outer::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 160px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .predict-track-outer::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg, #0d1120) 0%, transparent 100%);
+  }
+  .predict-track-outer::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg, #0d1120) 0%, transparent 100%);
+  }
+  .predict-track {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    will-change: transform;
+  }
+  @keyframes tickerLeft {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes tickerRight {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+  .scroll-left  { animation: tickerLeft  60s linear infinite; }
+  .scroll-right { animation: tickerRight 60s linear infinite; }
+  .predict-row2 { display: none; }
+  @media (min-width: 768px) {
+    .scroll-left  { animation-duration: 40s; }
+    .scroll-right { animation-duration: 40s; }
+  }
+  .predict-track:hover { animation-play-state: paused; }
+
+  .predict-card {
+    flex: 0 0 auto;
+    width: 280px;
+    background: linear-gradient(160deg, #1a2235 0%, #141b2c 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .predict-card:hover { border-color: rgba(245,200,66,0.35); }
+  .predict-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .predict-card-league {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #0f1625;
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .predict-card-match {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .predict-card-body {
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .predict-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .predict-row:last-child { border-bottom: none; }
+  .predict-row-flag { font-size: 18px; flex-shrink: 0; }
+  .predict-row-label {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 500;
+  }
+  .predict-row-pct {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .predict-row-btns {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .predict-btn {
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+  .predict-btn.yes { background: rgba(245,200,66,0.15); color: #F5C842; border-color: rgba(245,200,66,0.35); }
+  .predict-btn.no  { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1); }
+  .predict-btn:hover { filter: brightness(1.25); }
+  .predict-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px 12px;
+  }
+  .predict-timer {
+    background: #0d1120;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .predict-vol {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+  }
 </style>
 </head>
 <body>
@@ -2661,6 +2822,11 @@
       <!-- My stats -->
       <div class="hero-mystats">
         <div class="mystat">
+          <div class="mystat-val accent">23</div>
+          <div class="mystat-label">已参与预测</div>
+          <div class="mystat-change up">↑ +3</div>
+        </div>
+        <div class="mystat">
           <div class="mystat-val">⚽500</div>
           <div class="mystat-label">我的世界币</div>
           <div class="mystat-change up">↑ +200</div>
@@ -2695,215 +2861,416 @@
     </div>
   </div>
 
+
+
   <!-- ── 每日竞猜 ── -->
-  <div class="section" id="sec-match">
-    <div class="section-header">
-      <div class="section-title">每日竞猜</div>
-      <div class="tag tag-live">🔴 进行中</div>
-    </div>
-
-    <!-- Match 1 -->
-    <div class="match-card">
-      <div class="right-bar"></div>
-      <div class="match-meta">
-        <div class="match-time">今天 22:00 · 小组赛 A组</div>
-        <div class="tag tag-live">竞猜中</div>
+  <div class="section" id="sec-match" style="padding-left:0;padding-right:0">
+    <div class="predict-head-wrap" style="padding:0 16px 14px">
+      <div class="section-header" style="margin-bottom:8px">
+        <div class="section-title">每日竞猜</div>
       </div>
-      <div class="match-arena">
-        <div class="team home">
-          <div class="team-flag-wrap">
-            <div class="team-flag">🇧🇷</div>
+      <div style="background:linear-gradient(135deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.02) 100%);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏆</div>
+          <div>
+            <div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:0.2px">参与预测市场赢取世界币</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap">
+              <div style="font-size:12px;color:rgba(255,255,255,0.45)">每场比赛均可参与 · 无论结果均有奖励</div>
+              <button style="font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);border-radius:20px;padding:5px 14px;cursor:pointer;white-space:nowrap;transition:all 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.12)';this.style.borderColor='rgba(255,255,255,0.22)'">查看更多 ›</button>
+            </div>
           </div>
-          <div class="team-name">巴西</div>
-          <div class="team-odds-pill">看好 58%</div>
         </div>
-        <div class="vs-center">
-          <div class="vs-text">VS</div>
-
-        </div>
-        <div class="team away">
-          <div class="team-flag-wrap">
-            <div class="team-flag">🇦🇷</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="background:rgba(46,204,113,0.12);border:1.5px solid rgba(46,204,113,0.4);border-radius:12px;padding:10px 18px;text-align:center">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">✓ 预测成功</div>
+            <div style="font-size:22px;font-weight:900;color:#2ECC71;line-height:1">×3</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">世界币</div>
           </div>
-          <div class="team-name">阿根廷</div>
-          <div class="team-odds-pill">看好 42%</div>
-        </div>
-      </div>
-      <div class="bet-joined-summary">
-        <div class="bet-joined-pill">
-          <span class="bet-joined-check">✓ 已竞猜</span>
-          <div class="bet-joined-sep"></div>
-          <span class="bet-joined-choice">巴西胜</span>
-          <span class="bet-joined-odds">×2</span>
-        </div>
-      </div>
-      <div class="match-bet-result">
-        <span style="color:var(--text3)">我的竞猜 · 巴西胜</span>
-        <span>投入 <span style="color:var(--gold);font-weight:700">1,000</span> · 猜对可得 <span style="color:var(--green);font-weight:700">+2,000</span></span>
-      </div>
-      <div class="progress-wrap" style="margin-top:10px">
-        <div class="progress-bar">
-          <div class="progress-home" style="width:54%">54%</div>
-          <div class="progress-draw" style="width:12%">12%</div>
-          <div class="progress-away" style="width:34%">34%</div>
-        </div>
-        <div class="progress-labels" style="justify-content:center">
-          <span class="prog-count">参与人数 2,341</span>
+          <div style="background:rgba(231,76,60,0.12);border:1.5px solid rgba(231,76,60,0.4);border-radius:12px;padding:10px 18px;text-align:center">
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px">✕ 预测失败</div>
+            <div style="font-size:22px;font-weight:900;color:#E74C3C;line-height:1">×2</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px">世界币</div>
+          </div>
         </div>
       </div>
     </div>
+    <div class="predict-ticker-wrap">
 
-    <!-- Match 2 -->
-    <div class="match-card">
-      <div class="right-bar"></div>
-      <div class="match-meta">
-        <div class="match-time">今天 22:00 · 小组赛 B组</div>
-        <div class="tag tag-upcoming">即将开始</div>
-      </div>
-      <div class="match-arena">
-        <div class="team home">
-          <div class="team-flag-wrap">
-            <div class="team-flag">🇩🇪</div>
+      <!-- Row 1: scroll left -->
+      <div class="predict-track-outer">
+        <div class="predict-track scroll-left" id="predictRow1">
+          <!-- cards × 10, duplicated below for infinite loop -->
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚽</div><div class="predict-card-match">加拿大 vs 巴拉圭</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇦</div><div class="predict-row-label">加拿大进前8</div><div class="predict-row-pct">39%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇵🇾</div><div class="predict-row-label">巴拉圭首发进球</div><div class="predict-row-pct">51%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进入加时</div><div class="predict-row-pct">22%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 17:56:14</div><div class="predict-vol">$2,738,695 vol</div></div>
           </div>
-          <div class="team-name">德国</div>
-          <div class="team-odds-pill">看好 35%</div>
-        </div>
-        <div class="vs-center">
-          <div class="vs-text">VS</div>
-
-        </div>
-        <div class="team away">
-          <div class="team-flag-wrap">
-            <div class="team-flag">🇫🇷</div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏆</div><div class="predict-card-match">巴西 vs 阿根廷</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇧🇷</div><div class="predict-row-label">巴西首先破门</div><div class="predict-row-pct">54%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇦🇷</div><div class="predict-row-label">梅西进球</div><div class="predict-row-pct">48%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">上半场0-0结束</div><div class="predict-row-pct">31%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 20:30:00</div><div class="predict-vol">$5,120,400 vol</div></div>
           </div>
-          <div class="team-name">法国</div>
-          <div class="team-odds-pill">看好 65%</div>
-        </div>
-      </div>
-      <div class="clash-line"></div>
-      <div class="bet-options">
-        <div class="bet-btn" data-option="德国胜" data-odds="2" data-match="2026世界杯 · 小组赛 B组">
-          <div class="bet-label">德国胜</div>
-          <div class="bet-odds home">×2</div>
-        </div>
-        <div class="bet-btn" data-option="平局" data-odds="2" data-match="2026世界杯 · 小组赛 B组">
-          <div class="bet-label">平局</div>
-          <div class="bet-odds draw">×2</div>
-        </div>
-        <div class="bet-btn" data-option="法国胜" data-odds="2" data-match="2026世界杯 · 小组赛 B组">
-          <div class="bet-label">法国胜</div>
-          <div class="bet-odds away">×2</div>
-        </div>
-      </div>
-      <div class="progress-wrap">
-        <div class="progress-bar">
-          <div class="progress-home" style="width:35%">35%</div>
-          <div class="progress-draw" style="width:18%">18%</div>
-          <div class="progress-away" style="width:47%">47%</div>
-        </div>
-        <div class="progress-labels" style="justify-content:center">
-          <span class="prog-count">参与人数 1,876</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 冠军竞猜 ── -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">冠军竞猜</div>
-      <div class="champ-subtitle">谁是2026世界杯冠军？</div>
-    </div>
-
-    <div class="champion-wrap">
-      <div style="position:relative">
-        <!-- Viewport -->
-        <div class="champ-viewport" id="champViewport">
-          <div class="champ-track" id="champTrack">
-            <div class="champ-slide champ-joined" data-color="green" data-idx="0">
-              <div class="champ-question">⭐ 当前赔率最低</div>
-              <div class="champ-flag">🇧🇷</div>
-              <div class="champ-name">巴西</div>
-              <div class="champ-odds">× 100</div>
-              <div class="champ-meta">
-                <div class="champ-meta-item">👥 已有 <span>2,234</span> 人竞猜</div>
-                <div class="champ-meta-item">🏆 奖励 <span>×100</span></div>
-              </div>
-              <div class="champ-joined-panel">
-                <div class="champ-joined-title">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  已竞猜
-                </div>
-                <div class="champ-joined-row">
-                  <span>投入</span>
-                  <em>1,000 世界币</em>
-                </div>
-                <div class="champ-joined-row">
-                  <span>猜对可得</span>
-                  <em class="win">+100,000 世界币</em>
-                </div>
-              </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌍</div><div class="predict-card-match">德国 vs 法国</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇪</div><div class="predict-row-label">德国赢得比赛</div><div class="predict-row-pct">45%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇫🇷</div><div class="predict-row-label">姆巴佩梅开二度</div><div class="predict-row-pct">28%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球总数超3球</div><div class="predict-row-pct">57%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
             </div>
-            <div class="champ-slide" data-color="blue" data-idx="1">
-              <div class="champ-question">🔥 热门竞猜</div>
-              <div class="champ-flag">🇦🇷</div>
-              <div class="champ-name">阿根廷</div>
-              <div class="champ-odds">× 85</div>
-              <div class="champ-meta">
-                <div class="champ-meta-item">👥 已有 <span>1,891</span> 人竞猜</div>
-                <div class="champ-meta-item">🏆 奖励 <span>×85</span></div>
-              </div>
-              <button class="champ-card-btn" onclick="(function(b){var s=b.closest('.champ-slide');var n=s.querySelector('.champ-name').textContent.trim();var o=parseFloat(s.querySelector('.champ-odds').textContent.replace(/[^\d.]/g,''));if(window.openBetModal)window.openBetModal(n+' 夺冠',o,'2026世界杯 · 冠军竞猜')})(this)">加入竞猜</button>
-            </div>
-            <div class="champ-slide" data-color="blue" data-idx="2">
-              <div class="champ-question">🌟 卫冕冠军</div>
-              <div class="champ-flag">🇫🇷</div>
-              <div class="champ-name">法国</div>
-              <div class="champ-odds">× 75</div>
-              <div class="champ-meta">
-                <div class="champ-meta-item">👥 已有 <span>1,560</span> 人竞猜</div>
-                <div class="champ-meta-item">🏆 奖励 <span>×75</span></div>
-              </div>
-              <button class="champ-card-btn" onclick="(function(b){var s=b.closest('.champ-slide');var n=s.querySelector('.champ-name').textContent.trim();var o=parseFloat(s.querySelector('.champ-odds').textContent.replace(/[^\d.]/g,''));if(window.openBetModal)window.openBetModal(n+' 夺冠',o,'2026世界杯 · 冠军竞猜')})(this)">加入竞猜</button>
-            </div>
-            <div class="champ-slide" data-color="white" data-idx="3">
-              <div class="champ-question">💪 强力争冠</div>
-              <div class="champ-flag">🇩🇪</div>
-              <div class="champ-name">德国</div>
-              <div class="champ-odds">× 60</div>
-              <div class="champ-meta">
-                <div class="champ-meta-item">👥 已有 <span>1,230</span> 人竞猜</div>
-                <div class="champ-meta-item">🏆 奖励 <span>×60</span></div>
-              </div>
-              <button class="champ-card-btn" onclick="(function(b){var s=b.closest('.champ-slide');var n=s.querySelector('.champ-name').textContent.trim();var o=parseFloat(s.querySelector('.champ-odds').textContent.replace(/[^\d.]/g,''));if(window.openBetModal)window.openBetModal(n+' 夺冠',o,'2026世界杯 · 冠军竞猜')})(this)">加入竞猜</button>
-            </div>
-            <div class="champ-slide" data-color="red" data-idx="4">
-              <div class="champ-question">⚡ 黑马之选</div>
-              <div class="champ-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
-              <div class="champ-name">英格兰</div>
-              <div class="champ-odds">× 50</div>
-              <div class="champ-meta">
-                <div class="champ-meta-item">👥 已有 <span>980</span> 人竞猜</div>
-                <div class="champ-meta-item">🏆 奖励 <span>×50</span></div>
-              </div>
-              <button class="champ-card-btn" onclick="(function(b){var s=b.closest('.champ-slide');var n=s.querySelector('.champ-name').textContent.trim();var o=parseFloat(s.querySelector('.champ-odds').textContent.replace(/[^\d.]/g,''));if(window.openBetModal)window.openBetModal(n+' 夺冠',o,'2026世界杯 · 冠军竞猜')})(this)">加入竞猜</button>
-            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 02:00:00</div><div class="predict-vol">$3,890,220 vol</div></div>
           </div>
-          <div class="champ-arrow prev" id="champPrev">‹</div>
-          <div class="champ-arrow next" id="champNext">›</div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏅</div><div class="predict-card-match">西班牙 vs 英格兰</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇪🇸</div><div class="predict-row-label">西班牙控球超60%</div><div class="predict-row-pct">72%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div class="predict-row-label">英格兰点球得分</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">下半场定胜负</div><div class="predict-row-pct">61%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 05:45:00</div><div class="predict-vol">$4,210,780 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⭐</div><div class="predict-card-match">葡萄牙 vs 荷兰</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇵🇹</div><div class="predict-row-label">C罗助攻得分</div><div class="predict-row-pct">41%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇳🇱</div><div class="predict-row-label">荷兰赢得比赛</div><div class="predict-row-pct">52%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">出现红牌</div><div class="predict-row-pct">19%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 08:00:00</div><div class="predict-vol">$2,960,310 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🔥</div><div class="predict-card-match">日本 vs 韩国</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇯🇵</div><div class="predict-row-label">日本赢球</div><div class="predict-row-pct">46%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇰🇷</div><div class="predict-row-label">韩国零封对手</div><div class="predict-row-pct">23%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">首球15分钟内</div><div class="predict-row-pct">35%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 10:30:00</div><div class="predict-vol">$1,870,640 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌟</div><div class="predict-card-match">摩洛哥 vs 塞内加尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇲🇦</div><div class="predict-row-label">摩洛哥晋级</div><div class="predict-row-pct">55%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇸🇳</div><div class="predict-row-label">塞内加尔打进2球</div><div class="predict-row-pct">38%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛平局</div><div class="predict-row-pct">27%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 14:00:00</div><div class="predict-vol">$1,340,900 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">💥</div><div class="predict-card-match">美国 vs 墨西哥</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇺🇸</div><div class="predict-row-label">美国主场不败</div><div class="predict-row-pct">63%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇲🇽</div><div class="predict-row-label">墨西哥扳平比分</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">两队合计4球+</div><div class="predict-row-pct">49%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 18:00:00</div><div class="predict-vol">$3,560,120 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎯</div><div class="predict-card-match">澳大利亚 vs 伊朗</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇦🇺</div><div class="predict-row-label">澳大利亚获胜</div><div class="predict-row-pct">58%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇮🇷</div><div class="predict-row-label">伊朗打进点球</div><div class="predict-row-pct">29%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">下半场补时进球</div><div class="predict-row-pct">21%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">2D 00:30:00</div><div class="predict-vol">$980,450 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚡</div><div class="predict-card-match">克罗地亚 vs 塞尔维亚</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇭🇷</div><div class="predict-row-label">克罗地亚首球</div><div class="predict-row-pct">50%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇷🇸</div><div class="predict-row-label">塞尔维亚晋级</div><div class="predict-row-pct">43%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进入点球大战</div><div class="predict-row-pct">34%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">2D 04:00:00</div><div class="predict-vol">$1,650,880 vol</div></div>
+          </div>
+          <!-- duplicate for infinite loop -->
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚽</div><div class="predict-card-match">加拿大 vs 巴拉圭</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇦</div><div class="predict-row-label">加拿大进前8</div><div class="predict-row-pct">39%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇵🇾</div><div class="predict-row-label">巴拉圭首发进球</div><div class="predict-row-pct">51%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进入加时</div><div class="predict-row-pct">22%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 17:56:14</div><div class="predict-vol">$2,738,695 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏆</div><div class="predict-card-match">巴西 vs 阿根廷</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇧🇷</div><div class="predict-row-label">巴西首先破门</div><div class="predict-row-pct">54%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇦🇷</div><div class="predict-row-label">梅西进球</div><div class="predict-row-pct">48%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">上半场0-0结束</div><div class="predict-row-pct">31%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 20:30:00</div><div class="predict-vol">$5,120,400 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌍</div><div class="predict-card-match">德国 vs 法国</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇪</div><div class="predict-row-label">德国赢得比赛</div><div class="predict-row-pct">45%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇫🇷</div><div class="predict-row-label">姆巴佩梅开二度</div><div class="predict-row-pct">28%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球总数超3球</div><div class="predict-row-pct">57%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 02:00:00</div><div class="predict-vol">$3,890,220 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏅</div><div class="predict-card-match">西班牙 vs 英格兰</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇪🇸</div><div class="predict-row-label">西班牙控球超60%</div><div class="predict-row-pct">72%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div><div class="predict-row-label">英格兰点球得分</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">下半场定胜负</div><div class="predict-row-pct">61%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 05:45:00</div><div class="predict-vol">$4,210,780 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⭐</div><div class="predict-card-match">葡萄牙 vs 荷兰</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇵🇹</div><div class="predict-row-label">C罗助攻得分</div><div class="predict-row-pct">41%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇳🇱</div><div class="predict-row-label">荷兰赢得比赛</div><div class="predict-row-pct">52%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">出现红牌</div><div class="predict-row-pct">19%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 08:00:00</div><div class="predict-vol">$2,960,310 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🔥</div><div class="predict-card-match">日本 vs 韩国</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇯🇵</div><div class="predict-row-label">日本赢球</div><div class="predict-row-pct">46%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇰🇷</div><div class="predict-row-label">韩国零封对手</div><div class="predict-row-pct">23%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">首球15分钟内</div><div class="predict-row-pct">35%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 10:30:00</div><div class="predict-vol">$1,870,640 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌟</div><div class="predict-card-match">摩洛哥 vs 塞内加尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇲🇦</div><div class="predict-row-label">摩洛哥晋级</div><div class="predict-row-pct">55%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇸🇳</div><div class="predict-row-label">塞内加尔打进2球</div><div class="predict-row-pct">38%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛平局</div><div class="predict-row-pct">27%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 14:00:00</div><div class="predict-vol">$1,340,900 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">💥</div><div class="predict-card-match">美国 vs 墨西哥</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇺🇸</div><div class="predict-row-label">美国主场不败</div><div class="predict-row-pct">63%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇲🇽</div><div class="predict-row-label">墨西哥扳平比分</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">两队合计4球+</div><div class="predict-row-pct">49%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 18:00:00</div><div class="predict-vol">$3,560,120 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎯</div><div class="predict-card-match">澳大利亚 vs 伊朗</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇦🇺</div><div class="predict-row-label">澳大利亚获胜</div><div class="predict-row-pct">58%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇮🇷</div><div class="predict-row-label">伊朗打进点球</div><div class="predict-row-pct">29%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">下半场补时进球</div><div class="predict-row-pct">21%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">2D 00:30:00</div><div class="predict-vol">$980,450 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚡</div><div class="predict-card-match">克罗地亚 vs 塞尔维亚</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇭🇷</div><div class="predict-row-label">克罗地亚首球</div><div class="predict-row-pct">50%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇷🇸</div><div class="predict-row-label">塞尔维亚晋级</div><div class="predict-row-pct">43%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进入点球大战</div><div class="predict-row-pct">34%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">2D 04:00:00</div><div class="predict-vol">$1,650,880 vol</div></div>
+          </div>
         </div>
       </div>
 
-      <!-- Dots -->
-      <div class="champ-dots" id="champDots" style="background:transparent;padding:12px 0 4px">
-        <div class="champ-dot active" data-idx="0"></div>
-        <div class="champ-dot" data-idx="1"></div>
-        <div class="champ-dot" data-idx="2"></div>
-        <div class="champ-dot" data-idx="3"></div>
-        <div class="champ-dot" data-idx="4"></div>
+      <!-- Row 2: scroll right (different 10 matches, desktop only) -->
+      <div class="predict-track-outer predict-row2">
+        <div class="predict-track scroll-right" id="predictRow2">
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🥇</div><div class="predict-card-match">意大利 vs 比利时</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇮🇹</div><div class="predict-row-label">意大利保持不失球</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇧🇪</div><div class="predict-row-label">德布劳内传射</div><div class="predict-row-pct">37%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进球超2球</div><div class="predict-row-pct">62%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 14:30:00</div><div class="predict-vol">$2,130,770 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎖</div><div class="predict-card-match">乌拉圭 vs 厄瓜多尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇺🇾</div><div class="predict-row-label">努涅斯首开记录</div><div class="predict-row-pct">42%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇪🇨</div><div class="predict-row-label">厄瓜多尔爆冷</div><div class="predict-row-pct">31%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">出现乌龙球</div><div class="predict-row-pct">14%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 18:00:00</div><div class="predict-vol">$1,450,230 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏟</div><div class="predict-card-match">波兰 vs 瑞士</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇵🇱</div><div class="predict-row-label">莱万多夫斯基进球</div><div class="predict-row-pct">61%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇭</div><div class="predict-row-label">瑞士晋级淘汰赛</div><div class="predict-row-pct">53%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">0-0平局</div><div class="predict-row-pct">16%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 22:00:00</div><div class="predict-vol">$880,560 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌐</div><div class="predict-card-match">尼日利亚 vs 科特迪瓦</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇳🇬</div><div class="predict-row-label">尼日利亚晋级</div><div class="predict-row-pct">49%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇮</div><div class="predict-row-label">科特迪瓦逆转</div><div class="predict-row-pct">36%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">红牌罚下</div><div class="predict-row-pct">23%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 00:00:00</div><div class="predict-vol">$760,340 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎪</div><div class="predict-card-match">沙特 vs 卡塔尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇸🇦</div><div class="predict-row-label">沙特主场优势</div><div class="predict-row-pct">67%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇶🇦</div><div class="predict-row-label">卡塔尔进球</div><div class="predict-row-pct">28%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛超过3球</div><div class="predict-row-pct">41%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 03:30:00</div><div class="predict-vol">$1,020,890 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏆</div><div class="predict-card-match">丹麦 vs 捷克</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇰</div><div class="predict-row-label">厄里克森助攻</div><div class="predict-row-pct">38%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇿</div><div class="predict-row-label">捷克1-0获胜</div><div class="predict-row-pct">25%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">双方各进一球</div><div class="predict-row-pct">47%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 06:00:00</div><div class="predict-vol">$1,190,450 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚽</div><div class="predict-card-match">阿尔及利亚 vs 突尼斯</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇿</div><div class="predict-row-label">阿尔及利亚晋级</div><div class="predict-row-pct">54%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇹🇳</div><div class="predict-row-label">突尼斯平局</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球少于2球</div><div class="predict-row-pct">40%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 09:00:00</div><div class="predict-vol">$670,120 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌏</div><div class="predict-card-match">中国 vs 越南</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇳</div><div class="predict-row-label">中国3球+获胜</div><div class="predict-row-pct">59%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇻🇳</div><div class="predict-row-label">越南进球</div><div class="predict-row-pct">21%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">上半场2球+</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 12:00:00</div><div class="predict-vol">$3,200,000 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🔮</div><div class="predict-card-match">土耳其 vs 奥地利</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇹🇷</div><div class="predict-row-label">土耳其晋级</div><div class="predict-row-pct">48%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇦🇹</div><div class="predict-row-label">奥地利扳平</div><div class="predict-row-pct">35%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">加时赛决出胜负</div><div class="predict-row-pct">26%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 16:30:00</div><div class="predict-vol">$1,110,670 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎯</div><div class="predict-card-match">哥伦比亚 vs 智利</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇴</div><div class="predict-row-label">哥伦比亚2-0</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇱</div><div class="predict-row-label">智利点球逆转</div><div class="predict-row-pct">27%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球超3球</div><div class="predict-row-pct">55%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 20:00:00</div><div class="predict-vol">$1,780,340 vol</div></div>
+          </div>
+          <!-- duplicate for infinite loop -->
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🥇</div><div class="predict-card-match">意大利 vs 比利时</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇮🇹</div><div class="predict-row-label">意大利保持不失球</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇧🇪</div><div class="predict-row-label">德布劳内传射</div><div class="predict-row-pct">37%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛进球超2球</div><div class="predict-row-pct">62%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 14:30:00</div><div class="predict-vol">$2,130,770 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎖</div><div class="predict-card-match">乌拉圭 vs 厄瓜多尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇺🇾</div><div class="predict-row-label">努涅斯首开记录</div><div class="predict-row-pct">42%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇪🇨</div><div class="predict-row-label">厄瓜多尔爆冷</div><div class="predict-row-pct">31%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">出现乌龙球</div><div class="predict-row-pct">14%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 18:00:00</div><div class="predict-vol">$1,450,230 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏟</div><div class="predict-card-match">波兰 vs 瑞士</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇵🇱</div><div class="predict-row-label">莱万多夫斯基进球</div><div class="predict-row-pct">61%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇭</div><div class="predict-row-label">瑞士晋级淘汰赛</div><div class="predict-row-pct">53%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">0-0平局</div><div class="predict-row-pct">16%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">0D 22:00:00</div><div class="predict-vol">$880,560 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌐</div><div class="predict-card-match">尼日利亚 vs 科特迪瓦</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇳🇬</div><div class="predict-row-label">尼日利亚晋级</div><div class="predict-row-pct">49%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇮</div><div class="predict-row-label">科特迪瓦逆转</div><div class="predict-row-pct">36%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">红牌罚下</div><div class="predict-row-pct">23%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 00:00:00</div><div class="predict-vol">$760,340 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎪</div><div class="predict-card-match">沙特 vs 卡塔尔</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇸🇦</div><div class="predict-row-label">沙特主场优势</div><div class="predict-row-pct">67%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇶🇦</div><div class="predict-row-label">卡塔尔进球</div><div class="predict-row-pct">28%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">比赛超过3球</div><div class="predict-row-pct">41%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 03:30:00</div><div class="predict-vol">$1,020,890 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🏆</div><div class="predict-card-match">丹麦 vs 捷克</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇰</div><div class="predict-row-label">厄里克森助攻</div><div class="predict-row-pct">38%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇿</div><div class="predict-row-label">捷克1-0获胜</div><div class="predict-row-pct">25%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">双方各进一球</div><div class="predict-row-pct">47%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 06:00:00</div><div class="predict-vol">$1,190,450 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">⚽</div><div class="predict-card-match">阿尔及利亚 vs 突尼斯</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇩🇿</div><div class="predict-row-label">阿尔及利亚晋级</div><div class="predict-row-pct">54%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇹🇳</div><div class="predict-row-label">突尼斯平局</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球少于2球</div><div class="predict-row-pct">40%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 09:00:00</div><div class="predict-vol">$670,120 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🌏</div><div class="predict-card-match">中国 vs 越南</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇳</div><div class="predict-row-label">中国3球+获胜</div><div class="predict-row-pct">59%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇻🇳</div><div class="predict-row-label">越南进球</div><div class="predict-row-pct">21%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">上半场2球+</div><div class="predict-row-pct">44%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 12:00:00</div><div class="predict-vol">$3,200,000 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🔮</div><div class="predict-card-match">土耳其 vs 奥地利</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇹🇷</div><div class="predict-row-label">土耳其晋级</div><div class="predict-row-pct">48%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇦🇹</div><div class="predict-row-label">奥地利扳平</div><div class="predict-row-pct">35%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">加时赛决出胜负</div><div class="predict-row-pct">26%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 16:30:00</div><div class="predict-vol">$1,110,670 vol</div></div>
+          </div>
+          <div class="predict-card">
+            <div class="predict-card-head"><div class="predict-card-league">🎯</div><div class="predict-card-match">哥伦比亚 vs 智利</div></div>
+            <div class="predict-card-body">
+              <div class="predict-row"><div class="predict-row-flag">🇨🇴</div><div class="predict-row-label">哥伦比亚2-0</div><div class="predict-row-pct">33%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">🇨🇱</div><div class="predict-row-label">智利点球逆转</div><div class="predict-row-pct">27%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+              <div class="predict-row"><div class="predict-row-flag">⚽</div><div class="predict-row-label">进球超3球</div><div class="predict-row-pct">55%</div><div class="predict-row-btns"><button class="predict-btn yes">YES</button><button class="predict-btn no">NO</button></div></div>
+            </div>
+            <div class="predict-card-foot"><div class="predict-timer">1D 20:00:00</div><div class="predict-vol">$1,780,340 vol</div></div>
+          </div>
+        </div>
       </div>
 
-      <button class="champion-btn" id="champBtn">加入竞猜</button>
     </div>
   </div>
 
