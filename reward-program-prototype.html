@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>意见与反馈 - 奖励计划 | BitTap</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #fff;
+      color: #000;
+      line-height: 1.5;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: #000;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 1280px; width: 100%; margin: 0 auto;
+      display: flex; align-items: center; gap: 24px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      color: #fff; font-size: 16px; font-weight: 700;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 24px; height: 24px;
+      background: #66FF66;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 14px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 4px; flex: 1; }
+    .nav-link {
+      color: #aaa; font-size: 13px; text-decoration: none;
+      padding: 6px 10px; border-radius: 4px; transition: .2s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .nav-link.active { color: #66FF66; }
+    .nav-badge {
+      background: #FF3333; color: #fff; font-size: 10px;
+      padding: 1px 5px; border-radius: 8px; font-weight: 600;
+    }
+    .nav-more { color: #aaa; font-size: 13px; cursor: default; }
+    .nav-dropdown-arrow { font-size: 8px; color: #888; }
+
+    .header-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+    .header-icon {
+      width: 20px; height: 20px; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-register {
+      padding: 6px 14px; border: 1px solid #555; border-radius: 4px;
+      color: #fff; font-size: 13px; text-decoration: none; transition: .2s;
+    }
+    .btn-register:hover { border-color: #888; }
+    .btn-login {
+      padding: 6px 20px; background: #66FF66; border-radius: 6px;
+      color: #000; font-size: 13px; font-weight: 700; text-decoration: none; transition: .2s;
+    }
+    .btn-login:hover { background: #55ee55; }
+
+    /* ===== Cookie Banner ===== */
+    .cookie-banner {
+      position: fixed; top: 56px; left: 0; right: 0; z-index: 99;
+      background: #f5f5f5; padding: 12px 24px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; font-size: 12px; color: #333;
+    }
+    .cookie-banner-inner {
+      max-width: 1280px; width: 100%; margin: 0 auto;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .cookie-text { flex: 1; line-height: 1.6; }
+    .cookie-text a { color: #007AFF; text-decoration: underline; }
+    .cookie-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-close-cookie {
+      padding: 6px 14px; border: 1px solid #333; border-radius: 4px;
+      background: #fff; color: #333; font-size: 12px; cursor: pointer;
+    }
+    .btn-accept-cookie {
+      padding: 6px 16px; border: none; border-radius: 4px;
+      background: #66FF66; color: #000; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+
+    /* ===== Main Content ===== */
+    .main {
+      margin: 0 auto;
+      max-width: 1280px;
+      padding: 0 24px;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 48px;
+      display: flex; gap: 80px; align-items: center;
+    }
+    .hero-text { flex: 1; }
+    .hero-title {
+      font-size: 44px; font-weight: 800; color: #000;
+      line-height: 1.15; margin-bottom: 20px;
+    }
+    .hero-desc {
+      font-size: 15px; color: #666; line-height: 1.6;
+      max-width: 540px;
+    }
+    .hero-illustration { flex-shrink: 0; }
+    .vault-svg {
+      width: 280px; height: 280px;
+    }
+
+    /* ===== Tabs ===== */
+    .tabs {
+      display: flex; gap: 12px; margin-bottom: 40px;
+    }
+    .tab {
+      padding: 8px 24px; border-radius: 6px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: .2s; text-decoration: none;
+    }
+    .tab-create {
+      border: 1px solid #FF3333; color: #FF3333; background: #fff;
+    }
+    .tab-create:hover { background: #FF3333; color: #fff; }
+    .tab-reward {
+      border: none; background: #66FF66; color: #000;
+    }
+    .tab-reward:hover { background: #55ee55; }
+
+    /* ===== Reward Section ===== */
+    .reward-section { margin-bottom: 64px; }
+    .reward-intro {
+      font-size: 14px; color: #333; line-height: 1.7;
+      background: #f9f9f9; border-radius: 8px; padding: 20px 24px;
+      margin-bottom: 40px;
+    }
+    .reward-intro strong { color: #66FF66; }
+
+    .reward-cols {
+      display: flex; gap: 32px;
+    }
+    .reward-col { flex: 1; }
+    .reward-subtitle {
+      font-size: 16px; font-weight: 700; color: #000;
+      margin-bottom: 16px;
+    }
+
+    .reward-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .reward-table th, .reward-table td {
+      padding: 14px 20px; text-align: left;
+      font-size: 14px; border-bottom: 1px solid #eee;
+    }
+    .reward-table th {
+      font-weight: 600; color: #666; background: #f9f9f9;
+      font-size: 13px;
+    }
+    .reward-table td:last-child {
+      font-weight: 700; color: #66FF66;
+    }
+    .reward-table tr:last-child td { border-bottom: none; }
+
+    /* ===== Tip ===== */
+    .tip-box {
+      background: #f9f9f9; border-radius: 8px; padding: 20px 24px;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .tip-box .tip-icon {
+      width: 20px; height: 20px; background: #66FF66; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 700; font-size: 12px; flex-shrink: 0;
+    }
+    .tip-box .tip-text { font-size: 13px; color: #333; }
+    .tip-box a {
+      color: #66FF66; text-decoration: none; font-weight: 600;
+    }
+    .tip-box a:hover { text-decoration: underline; }
+    .disclaimer {
+      font-size: 12px; color: #999; margin-bottom: 48px;
+    }
+
+    /* ===== Other Feedback Cards ===== */
+    .feedback-cards { margin-bottom: 64px; }
+    .feedback-cards-title {
+      font-size: 22px; font-weight: 700; margin-bottom: 24px;
+    }
+    .cards-row {
+      display: flex; gap: 24px;
+    }
+    .feedback-card {
+      flex: 1; border: 1px solid #eee; border-radius: 12px;
+      padding: 32px; transition: .2s; cursor: pointer;
+    }
+    .feedback-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-color: #ddd; }
+    .card-icon-wrap {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .card-icon-wrap.green { background: #e6ffe6; }
+    .card-icon-wrap.blue { background: #e6f0ff; }
+    .card-icon-wrap.orange { background: #fff3e6; }
+    .card-title {
+      font-size: 16px; font-weight: 700; color: #000; margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px;
+    }
+    .card-btn {
+      display: inline-block; padding: 8px 20px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; text-decoration: none; transition: .2s;
+    }
+    .card-btn.green {
+      background: #66FF66; color: #000;
+    }
+    .card-btn.green:hover { background: #55ee55; }
+    .card-btn.outline {
+      border: 1px solid #66FF66; color: #66FF66; background: transparent;
+    }
+    .card-btn.outline:hover { background: #66FF66; color: #000; }
+
+    /* ===== Footer ===== */
+    .footer {
+      background: #000; color: #fff; padding: 48px 24px 24px;
+      margin-top: 40px;
+    }
+    .footer-inner {
+      max-width: 1280px; width: 100%; margin: 0 auto;
+    }
+    .footer-cols {
+      display: flex; gap: 48px; margin-bottom: 40px;
+    }
+    .footer-col { flex: 1; }
+    .footer-col-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 16px; color: #fff;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a {
+      color: #888; font-size: 13px; text-decoration: none; transition: .2s;
+    }
+    .footer-links a:hover { color: #fff; }
+
+    .footer-social {
+      display: flex; gap: 12px; margin-bottom: 24px;
+    }
+    .social-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #222; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; transition: .2s; cursor: pointer;
+    }
+    .social-icon:hover { background: #66FF66; color: #000; }
+
+    .footer-bottom {
+      border-top: 1px solid #222; padding-top: 20px;
+      display: flex; align-items: center; gap: 24px; font-size: 12px; color: #666;
+    }
+    .footer-bottom a { color: #666; text-decoration: none; }
+    .footer-bottom a:hover { color: #fff; }
+
+    /* ===== SVG icons inline ===== */
+    .icon-svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; gap: 32px; padding-top: 120px; }
+      .hero-title { font-size: 32px; }
+      .reward-cols { flex-direction: column; gap: 32px; }
+      .cards-row { flex-direction: column; }
+      .footer-cols { flex-wrap: wrap; gap: 24px; }
+      .footer-col { flex: auto; min-width: 140px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <span class="logo-icon">B</span>
+      BitTap
+    </a>
+    <div class="nav-links">
+      <a href="#" class="nav-link">购买加密货币 <span class="nav-dropdown-arrow">▼</span></a>
+      <a href="#" class="nav-link">行情 <span class="nav-badge">50</span></a>
+      <a href="#" class="nav-link">现货 <span class="nav-badge">51</span></a>
+      <a href="#" class="nav-link">合约 <span class="nav-badge">52</span></a>
+      <a href="#" class="nav-link">事件合约 <span class="nav-badge">53</span></a>
+      <a href="#" class="nav-link">美股RWA <span class="nav-badge">54</span></a>
+      <a href="#" class="nav-link">理财 <span class="nav-badge">55</span></a>
+      <span class="nav-more">更多 <span class="nav-dropdown-arrow">▼</span></span>
+    </div>
+    <div class="header-right">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <a href="#" class="btn-register">注册</a>
+      <a href="#" class="btn-login">登录</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Cookie Banner ===== -->
+<div class="cookie-banner">
+  <div class="cookie-banner-inner">
+    <div class="cookie-text">
+      欢迎来到 BitTap。为了提升您的用户体验并确保我们的服务高效运行，当您访问我们的网站和应用程序时，我们会使用 Cookie。您可以通过浏览器设置来选择禁止某些类型的 Cookie。如需了解更多信息，请参阅我们的 <a href="#">Cookie 政策</a>。
+    </div>
+    <div class="cookie-actions">
+      <button class="btn-close-cookie">关闭</button>
+      <button class="btn-accept-cookie">接受</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Main ===== -->
+<div class="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1 class="hero-title">意见与反馈</h1>
+      <p class="hero-desc">为了实现卓越的产品迭代，我们一直在倾听您的反馈！您的宝贵见解和对新趋势的洞察都可以与我们分享</p>
+    </div>
+    <div class="hero-illustration">
+      <svg class="vault-svg" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Vault body -->
+        <rect x="40" y="70" width="200" height="160" rx="16" fill="#66FF66" stroke="#000" stroke-width="2"/>
+        <!-- Vault door -->
+        <rect x="55" y="85" width="170" height="130" rx="10" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <!-- Lock circle -->
+        <circle cx="140" cy="150" r="32" fill="#66FF66" stroke="#000" stroke-width="2"/>
+        <circle cx="140" cy="150" r="20" fill="#fff" stroke="#000" stroke-width="1"/>
+        <!-- Keyhole -->
+        <circle cx="140" cy="148" r="6" fill="#000"/>
+        <rect x="137" y="150" width="6" height="10" rx="2" fill="#000"/>
+        <!-- BitTap logo in lock -->
+        <polygon points="140,138 148,143 148,153 140,158 132,153 132,143" fill="#66FF66" stroke="#000" stroke-width="1"/>
+        <!-- Card slot -->
+        <rect x="80" y="90" width="120" height="16" rx="4" fill="#e6ffe6" stroke="#000" stroke-width="1"/>
+        <rect x="80" y="92" width="120" height="4" rx="2" fill="#66FF66" opacity="0.4"/>
+        <!-- Coins at bottom -->
+        <circle cx="100" cy="202" r="10" fill="#F7931A" stroke="#000" stroke-width="1.5"/>
+        <text x="100" y="206" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">₿</text>
+        <circle cx="130" cy="206" r="10" fill="#627EEA" stroke="#000" stroke-width="1.5"/>
+        <text x="130" y="210" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">Ξ</text>
+        <circle cx="160" cy="202" r="10" fill="#50AF95" stroke="#000" stroke-width="1.5"/>
+        <text x="160" y="206" text-anchor="middle" font-size="6" font-weight="700" fill="#fff">USDT</text>
+        <!-- Coin stacks -->
+        <circle cx="115" cy="212" r="8" fill="#F7931A" stroke="#000" stroke-width="1"/>
+        <circle cx="145" cy="214" r="8" fill="#627EEA" stroke="#000" stroke-width="1"/>
+        <!-- Safe handle -->
+        <rect x="110" y="62" width="60" height="12" rx="6" fill="#66FF66" stroke="#000" stroke-width="2"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <a href="#" class="tab tab-create">创建工单</a>
+    <a href="#" class="tab tab-reward">奖励计划</a>
+  </div>
+
+  <!-- Reward Program Content -->
+  <section class="reward-section">
+    <div class="reward-intro">
+      我们重视用户提出的优秀建议。如果您有任何与安全相关的问题或建议，您可以在此提交。任何可能导致系统中断、数据泄露或用户财务损失的漏洞，只要构成系统性威胁，都可以进行报告。经评估和采纳后，我们将提供一定的奖励，<strong>奖励金额范围为 500 USDT 至 3000 USDT</strong>
+    </div>
+
+    <div class="reward-cols">
+      <!-- Left table: Suggestions -->
+      <div class="reward-col">
+        <div class="reward-subtitle">奖励标准（通过审核后）</div>
+        <table class="reward-table">
+          <thead>
+            <tr><th>建议等级</th><th>奖励金额</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>一般建议</td><td>3,000 USDT</td></tr>
+            <tr><td>卓越建议</td><td>10,000 USDT</td></tr>
+            <tr><td>重大改进</td><td>30,000 USDT</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right table: Vulnerabilities -->
+      <div class="reward-col">
+        <div class="reward-subtitle">&nbsp;</div>
+        <table class="reward-table">
+          <thead>
+            <tr><th>漏洞等级</th><th>奖励金额</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>轻微问题</td><td>500 USDT</td></tr>
+            <tr><td>中等问题</td><td>2,000 USDT</td></tr>
+            <tr><td>重大问题</td><td>10,000 USDT</td></tr>
+            <tr><td>关键漏洞</td><td>30,000 USDT</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tip & Disclaimer -->
+    <div class="tip-box" style="margin-top:40px;">
+      <span class="tip-icon">!</span>
+      <span class="tip-text">温馨提示：如有任何疑问，可前往 <a href="#">帮助中心</a> 查看常见问题或联系客服</span>
+    </div>
+    <p class="disclaimer">最终解释权归BitTap平台所有</p>
+  </section>
+
+  <!-- Other Feedback Cards -->
+  <section class="feedback-cards">
+    <h2 class="feedback-cards-title">提交其他反馈</h2>
+    <div class="cards-row">
+      <!-- Card 1 -->
+      <div class="feedback-card">
+        <div class="card-icon-wrap green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#66FF66" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="card-title">漏洞奖励计划</div>
+        <div class="card-desc">如果您遇到系统故障、数据延迟、服务卡顿、异常错误或其他问题，您可以提交工单给技术团队。我们将对问题进行评估，并可能提供相应的奖励</div>
+        <a href="#" class="card-btn green">前往了解</a>
+      </div>
+      <!-- Card 2 -->
+      <div class="feedback-card">
+        <div class="card-icon-wrap blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A8EFF" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M20 21a8 8 0 1 0-16 0"/>
+          </svg>
+        </div>
+        <div class="card-title">个人工单</div>
+        <div class="card-desc">如果您对个人账户有疑问，例如注册、登录、身份验证、充值和提现、安全设置重置等，提交工单将帮助我们快速解决问题</div>
+        <a href="#" class="card-btn outline">提交</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <!-- Social -->
+    <div class="footer-social">
+      <div class="social-icon">T</div>
+      <div class="social-icon">X</div>
+      <div class="social-icon">M</div>
+      <div class="social-icon">Y</div>
+      <div class="social-icon">D</div>
+      <div class="social-icon">R</div>
+      <div class="social-icon">S</div>
+    </div>
+
+    <!-- Columns -->
+    <div class="footer-cols">
+      <div class="footer-col">
+        <div class="footer-col-title">关于我们</div>
+        <ul class="footer-links">
+          <li><a href="#">关于 BitTap</a></li>
+          <li><a href="#">最新公告</a></li>
+          <li><a href="#">新闻</a></li>
+          <li><a href="#">隐私政策</a></li>
+          <li><a href="#">风险提示</a></li>
+          <li><a href="#">Cookie 政策</a></li>
+          <li><a href="#">下载</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">支持</div>
+        <ul class="footer-links">
+          <li><a href="#">帮助中心</a></li>
+          <li><a href="#">常见问题</a></li>
+          <li><a href="#">提交工单</a></li>
+          <li><a href="#">反馈</a></li>
+          <li><a href="#">安全解决方案</a></li>
+          <li><a href="#">官方验证</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">服务</div>
+        <ul class="footer-links">
+          <li><a href="#">API 文档</a></li>
+          <li><a href="#">邀请好友</a></li>
+          <li><a href="#">代理商计划</a></li>
+          <li><a href="#">上币申请</a></li>
+          <li><a href="#">BitTap VIP</a></li>
+          <li><a href="#">费率标准</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">产品</div>
+        <ul class="footer-links">
+          <li><a href="#">现货交易</a></li>
+          <li><a href="#">合约交易</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="footer-bottom">
+      <span>© 2025 BitTap</span>
+      <a href="#">隐私政策</a>
+      <a href="#">服务协议</a>
+      <a href="#">Cookie 政策</a>
+      <span style="margin-left:auto;">接受</span>
+      <span>关闭</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

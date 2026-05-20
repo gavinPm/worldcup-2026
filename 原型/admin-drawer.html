@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增配置 · 后台管理</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #E8F4E8; --card: #fff; --border: #D0D5DD;
+  --text: #1D2939; --text2: #667085; --text3: #98A2B3;
+  --blue: #2E5BFF; --blue-light: #EEF2FF;
+}
+body {
+  font-family: -apple-system,'PingFang SC','Helvetica Neue',sans-serif;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: flex-start; justify-content: flex-end;
+  min-height: 100vh; font-size: 14px; color: var(--text);
+}
+.drawer {
+  width: 660px; background: #fff; min-height: 100vh;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+}
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.drawer-header-left { display: flex; flex-direction: column; gap: 2px; }
+.drawer-title { font-size: 16px; font-weight: 700; color: #101828; }
+.drawer-sub { font-size: 12px; color: var(--text3); }
+.drawer-close {
+  background: none; border: none; font-size: 22px; color: var(--text3);
+  cursor: pointer; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center; border-radius: 6px;
+}
+.drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+.drawer-footer {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 12px; flex-shrink: 0;
+}
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 15px; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title::before { content:''; width:4px; height:16px; border-radius:2px; background:var(--blue); }
+.card-subtitle { font-size: 12px; color: var(--text3); font-weight: 400; margin-left: auto; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-hint { font-size: 12px; color: var(--text3); margin-top: -2px; }
+.form-input {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; color: var(--text); background: #FAFBFC;
+  outline: none; width: 180px; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--blue); background: #fff; }
+.form-input.wide { width: 100%; max-width: 420px; }
+.form-row { display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+.custom-select { position: relative; width: 160px; }
+.custom-select-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; background: #FAFBFC; cursor: pointer; user-select: none;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent;
+}
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-outline { background: #fff; color: var(--text2); border-color: var(--border); }
+</style>
+</head>
+<body>
+<div class="drawer">
+  <div class="drawer-header">
+    <div class="drawer-header-left">
+      <div class="drawer-title">新增配置</div>
+      <div class="drawer-sub">配置该日 08:00 生效（美国东部时间 / 北京时间 20:00）</div>
+    </div>
+    <button class="drawer-close">×</button>
+  </div>
+
+  <div class="drawer-body">
+    <!-- 日期选择 -->
+    <div style="margin-bottom:20px">
+      <div class="form-group">
+        <div class="form-label">配置日期</div>
+        <div class="custom-select">
+          <div class="custom-select-trigger">
+            <span style="color:var(--text3)">请选择日期</span>
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#98A2B3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片1：竞猜倍数 -->
+    <div class="card">
+      <div class="card-title">每日赛事<span class="card-subtitle">该日开放的竞猜比赛</span></div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap">
+        <div class="form-group" style="margin:0">
+          <div class="form-label">预测成功奖励倍数</div>
+          <input class="form-input" type="number" value="3" min="1" style="width:120px;margin-top:4px">
+        </div>
+        <div class="form-group" style="margin:0">
+          <div class="form-label">预测失败奖励倍数</div>
+          <input class="form-input" type="number" value="2" min="1" style="width:120px;margin-top:4px">
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片2：社交任务 -->
+    <div class="card">
+      <div class="card-title">每日社交任务<span class="card-subtitle">当日开放的 X 评论任务</span></div>
+      <div class="form-group">
+        <div class="form-label">X 帖子链接</div>
+        <div class="form-hint">用户需在该帖子下评论，完成后得 +10 世界币</div>
+        <input class="form-input wide" type="url" placeholder="https://x.com/BitTap/status/..." style="margin-top:2px">
+      </div>
+    </div>
+
+    <!-- 卡片3：每日赠送 -->
+    <div class="card">
+      <div class="card-title">每日赠送世界币<span class="card-subtitle">08:00 自动发放</span></div>
+      <div class="form-group">
+        <div class="form-label">赠送数量</div>
+        <div class="form-hint">当日未使用次日收回</div>
+        <input class="form-input" type="number" value="10" min="0" style="margin-top:2px">
+      </div>
+    </div>
+
+    <!-- 卡片4：抽奖 -->
+    <div class="card">
+      <div class="card-title">每日抽奖<span class="card-subtitle">08:00 重置</span></div>
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">每日次数上限</div>
+          <div class="form-hint">每位用户每日最多可抽</div>
+          <input class="form-input" type="number" value="3" min="1" style="margin-top:2px">
+        </div>
+        <div class="form-group">
+          <div class="form-label">每次消耗世界币</div>
+          <div class="form-hint">每次抽奖扣除</div>
+          <input class="form-input" type="number" value="100" min="1" style="margin-top:2px">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-footer">
+    <button class="btn btn-primary">保存配置</button>
+    <button class="btn btn-outline">取消</button>
+  </div>
+</div>
+</body>
+</html>

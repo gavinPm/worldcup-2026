@@ -461,11 +461,11 @@ body {
       <div style="display:flex;gap:32px;flex-wrap:wrap;margin-top:8px">
         <div class="form-group" style="margin:0">
           <div class="form-label">预测成功奖励倍数</div>
-          <input class="form-input" type="number" value="3" min="1" style="width:120px;margin-top:8px">
+          <input class="form-input" id="successOdds" type="number" value="3" min="1" style="width:120px;margin-top:8px">
         </div>
         <div class="form-group" style="margin:0">
           <div class="form-label">预测失败奖励倍数</div>
-          <input class="form-input" type="number" value="2" min="1" style="width:120px;margin-top:8px">
+          <input class="form-input" id="failOdds" type="number" value="2" min="1" style="width:120px;margin-top:8px">
         </div>
       </div>
     </div>
@@ -709,8 +709,6 @@ function openDrawer(date, isRest) {
     document.querySelectorAll('.custom-select-option').forEach(function(o){ o.classList.remove('selected'); });
   }
   var rest = !!isRest;
-  document.getElementById('isRestDay').checked = rest;
-  toggleRestDay(rest);
   clearErrors();
   document.getElementById('editOverlay').classList.add('show');
   document.getElementById('editDrawer').classList.add('show');
@@ -885,8 +883,6 @@ function saveConfig() {
   clearErrors();
   var ok = true;
   var dateInput = document.getElementById('editDate');
-  var isRest = document.getElementById('isRestDay').checked;
-
   // 日期校验（新增模式）
   if (!_editingDate) {
     if (!dateInput.value) {
@@ -902,21 +898,8 @@ function saveConfig() {
     }
   }
 
-  // 非休赛日：至少一场赛事
-  if (!isRest) {
-    var rows = document.getElementById('matchTbody').rows;
-    if (rows.length === 0) {
-      var addBtn = document.querySelector('#matchCard .btn-row');
-      var err = document.createElement('div');
-      err.className = 'field-error';
-      err.textContent = '请至少添加一场比赛';
-      addBtn.appendChild(err);
-      ok = false;
-    }
-  }
-
   // 必填数字字段
-  [['dailyCoin','请填写赠送数量'],['maxDraws','请填写次数上限'],['drawCost','请填写消耗数量']].forEach(function(pair) {
+  [['successOdds','请填写成功倍数'],['failOdds','请填写失败倍数'],['dailyCoin','请填写赠送数量'],['maxDraws','请填写次数上限'],['drawCost','请填写消耗数量']].forEach(function(pair) {
     var el = document.getElementById(pair[0]);
     if (!el.value || Number(el.value) <= 0) { showError(el, pair[1]); ok = false; }
   });
